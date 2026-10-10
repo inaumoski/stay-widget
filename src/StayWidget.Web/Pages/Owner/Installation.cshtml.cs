@@ -18,7 +18,7 @@ public sealed class InstallationModel(StayDb db, BookingService service, SiteOri
     public string Widget => site.Value + "/w/" + Property.Id;
     public string Loader => site.Value + "/embed/v1/loader.js";
     public string LoaderSnippet => $"<div data-staywidget=\"{Property.Id}\">\n  <a href=\"{Hosted}\" target=\"_blank\" rel=\"noopener\">Open reservation request page</a>\n</div>\n<script src=\"{Loader}\" defer></script>";
-    public string IframeSnippet => $"<iframe src=\"{Widget}\" title=\"Reservation requests\" width=\"100%\" height=\"860\" referrerpolicy=\"no-referrer\" sandbox=\"allow-scripts allow-same-origin allow-forms allow-popups allow-popups-to-escape-sandbox\"></iframe>\n<a href=\"{Hosted}\" target=\"_blank\" rel=\"noopener\">Open reservation request page</a>";
+    public string IframeSnippet => $"<iframe src=\"{Widget}\" title=\"Reservation requests\" width=\"100%\" height=\"640\" referrerpolicy=\"no-referrer\" sandbox=\"allow-scripts allow-same-origin allow-forms allow-popups allow-popups-to-escape-sandbox\"></iframe>\n<a href=\"{Hosted}\" target=\"_blank\" rel=\"noopener\">Open reservation request page</a>";
     private Guid Owner => Guid.Parse(User.FindFirstValue("staywidget:user")!);
     private async Task<bool> Load()
     {

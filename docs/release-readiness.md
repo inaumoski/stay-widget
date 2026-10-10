@@ -14,7 +14,7 @@ M1–M4 feature work is implemented. M5 local preparation is verified; **StayWid
 - M4: Free/Pro quotas and over-limit preservation, server-side branding, fixed promotion/continued free access, simple private feedback/Custom, aggregate choice/privacy/retry boundaries, crawlable public pages/private exclusions and nonpersistent demo.
 - Production-mode local fixture: canonical Host checks, explicit loopback proxy trust, no forwarded Host trust, private readiness, no Development login and authenticated owner boundaries. Synthetic issuer is deliberately unused; this is not Google callback evidence.
 - Synthetic PostgreSQL dump/restore to a different disposable database with copied private Data Protection keys recovered encrypted receipts, private accepted status, active inventory, overlap protection and migration history. Private rehearsal evidence is ignored under `.local/restore-rehearsal`.
-- Framework-dependent portable publish: 47 files / 9,611,939 bytes, required static assets present, no appsettings.Local.json and DevelopmentLogin disabled. Artifact is local/ignored. Selected Linux runtime execution has not been tested.
+- Framework-dependent portable publish: 47 files / 9,613,697 bytes, required static assets present, no appsettings.Local.json and DevelopmentLogin disabled. Artifact is local/ignored. Selected Linux runtime execution has not been tested.
 - Screenshots: 390px public pricing and 320px enlarged-text reflow inspected, plus prior owner/widget captures. A small Windows HTTPS read sample observed 119.9 MiB application working set and 56.8ms average across 20 sequential pricing reads (50.2ms p95). Not a capacity test or full accessibility audit.
 
 ## External gates still open

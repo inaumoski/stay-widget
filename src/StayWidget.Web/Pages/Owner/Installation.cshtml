@@ -20,7 +20,7 @@ else{<p>New requests are paused or the property is suspended. Existing bookings 
 <label for="loader-snippet">Loader snippet (automatically resizes the inner iframe)</label><textarea id="loader-snippet" class="install-snippet" readonly>@Model.LoaderSnippet</textarea><button type="button" data-copy-snippet="loader-snippet">Copy loader snippet</button>
 <p>Paste into a page that allows scripts. Your site's CSP must allow @Model.Loader under script-src and @Model.Widget under frame-src. Up to ten containers per page are supported. Repeated loading does not add duplicate frames. Content above 1,600px scrolls inside the frame.</p>
 <h2>Direct iframe / website builders</h2><label for="iframe-snippet">Fixed-height iframe snippet</label><textarea id="iframe-snippet" class="install-snippet" readonly>@Model.IframeSnippet</textarea><button type="button" data-copy-snippet="iframe-snippet">Copy iframe snippet</button>
-<p>A direct iframe uses an 860px container and internal scrolling; adjust the outer height in your builder. Private status and actions open in a new tab. Keep the visible hosted fallback link.</p>
+<p>A direct iframe uses an 640px container and internal scrolling; adjust the outer height in your builder. Private status and actions open in a new tab. Keep the visible hosted fallback link.</p>
 <h2>Hosted fallback</h2><a href="@Model.Hosted" target="_blank" rel="noopener">Open reservation request page</a>
 <h2>Record installation acknowledgement</h2>
 @if(Model.Property.InstallationAcknowledgedAt!=null){<p>Instructions acknowledged @Model.Property.InstallationAcknowledgedAt.Value.ToString("u"). This does not verify a published installation.</p>}

@@ -22,7 +22,7 @@ The installation screen supplies real URLs using the trusted canonical `StayWidg
 <script src="APP_ORIGIN/embed/v1/loader.js" defer></script>
 ```
 
-The loader inserts an isolated booking iframe and adjusts its height. It supports up to ten containers per page; repeat loading does not duplicate existing frames. Each instance has its own identifier. Messages carry only layout data, with exact origin/source/instance/payload checks and bounded height (320–1,600px). Longer content scrolls within the frame. Neither this protocol nor the parent website receives private guest capabilities. The guest flow does not depend on cookies or browser storage.
+The loader inserts an isolated booking iframe and adjusts its height up to 640px. It supports up to ten containers per page; repeat loading does not duplicate existing frames. Each instance has its own identifier. Messages carry only layout data, with exact origin/source/instance/payload checks and bounded displayed height (320–640px). Longer content scrolls within the frame using native browser scrolling; keyboard focus brings lower fields, submit and Terms links into view. Check-in/check-out share a compact row on narrow screens, and guests joins that row above 520px. Short receipts may shrink to 320px. Older valid v1 resize proposals up to 1,600px are accepted but displayed at no more than 640px. Existing manually pasted direct iframes retain their chosen height until edited; the generated snippet now uses 640px. Neither this protocol nor the parent website receives private guest capabilities. The guest flow does not depend on cookies or browser storage.
 
 The path `/embed/v1/loader.js` is the versioned public contract. It is cached for 300 seconds with revalidation and ETag. Compatible fixes can remain on v1; any future breaking protocol requires a new version and documented migration/support policy before rollout. No v1 end-of-support date has been set.
 
@@ -32,7 +32,7 @@ Your website must permit the application origin under CSP `script-src` and `fram
 
 ```html
 <iframe src="APP_ORIGIN/w/PROPERTY_UUID"
-        title="Reservation requests" width="100%" height="860"
+        title="Reservation requests" width="100%" height="640"
         referrerpolicy="no-referrer"
         sandbox="allow-scripts allow-same-origin allow-forms allow-popups allow-popups-to-escape-sandbox"></iframe>
 <a href="APP_ORIGIN/request/PROPERTY_UUID" target="_blank" rel="noopener">Open reservation request page</a>

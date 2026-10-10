@@ -8,9 +8,9 @@
 <form method="post" asp-antiforgery="false" action="/demo-widget?handler=Request&amp;InstanceId=@Model.InstanceId" class="card">
 <label asp-for="UnitId">Accommodation</label><select asp-for="UnitId">@foreach(var u in Model.Units){<option value="@u.Id" data-min-nights="@u.MinNights">@u.Name · up to @u.Capacity guests</option>}</select>
 <partial name="Shared/_AvailabilityCalendar" model="@(new StayWidget.Web.CalendarView("/api/demo/calendar",Model.UnitId.ToString(),1,Model.CalendarMonth))"/>
-<label asp-for="Arrival">Check-in</label><input asp-for="Arrival" type="date" required/>
-<label asp-for="Departure">Check-out</label><input asp-for="Departure" type="date" required/>
-<label asp-for="Guests">Guests</label><input asp-for="Guests" type="number" min="1" max="4" required/>
+<div class="stay-fields"><div><label asp-for="Arrival">Check-in</label><input asp-for="Arrival" type="date" required/></div>
+<div><label asp-for="Departure">Check-out</label><input asp-for="Departure" type="date" required/></div>
+<div><label asp-for="Guests">Guests</label><input asp-for="Guests" type="number" min="1" max="4" required/></div></div>
 <p>Sample availability only. Pending requests do not hold dates. The owner agrees price and terms before confirming.</p><button>Try a reservation request</button></form>
 }else if(Model.Stage=="Pending"){
 <section class="card" role="status"><h2>Request received — Pending</h2><p>@Model.UnitName · @Model.Arrival → @Model.Departure · @Model.Guests guests. This is not a confirmed reservation.</p><p>A real receipt includes a private status link. This demonstration saves nothing.</p><form method="post" asp-antiforgery="false" action="/demo-widget?handler=Confirm&amp;InstanceId=@Model.InstanceId"><input asp-for="UnitId" type="hidden"/><input asp-for="Arrival" type="hidden"/><input asp-for="Departure" type="hidden"/><input asp-for="Guests" type="hidden"/><button>Simulate owner confirmation</button></form></section>

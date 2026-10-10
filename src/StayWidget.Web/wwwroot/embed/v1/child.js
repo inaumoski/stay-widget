@@ -10,7 +10,7 @@
   function measure() {
     pending = null;
     if (!parentOrigin) return;
-    const height = Math.max(320, Math.min(1600, Math.ceil(document.body.getBoundingClientRect().height)));
+    const height = Math.max(320, Math.min(640, Math.ceil(document.body.getBoundingClientRect().height)));
     if (height === lastHeight || performance.now() - lastSent < 100) return;
     lastHeight = height; lastSent = performance.now();
     window.parent.postMessage({ v: 1, type: 'staywidget:resize', instance, height }, parentOrigin);

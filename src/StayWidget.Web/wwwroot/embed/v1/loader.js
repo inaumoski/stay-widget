@@ -12,7 +12,7 @@
       const instance = [...crypto.getRandomValues(new Uint8Array(16))].map(x => x.toString(16).padStart(2, '0')).join('');
       const frame = document.createElement('iframe');
       frame.title = 'Reservation requests';
-      frame.width = '100%'; frame.height = '860';
+      frame.width = '100%'; frame.height = '640';
       frame.style.border = '0'; frame.style.display = 'block';
       frame.referrerPolicy = 'no-referrer';
       frame.setAttribute('sandbox', 'allow-scripts allow-same-origin allow-forms allow-popups allow-popups-to-escape-sandbox');
@@ -24,7 +24,7 @@
         if (event.origin !== origin || event.source !== frame.contentWindow || !data || typeof data !== 'object' || Array.isArray(data)) return;
         if (Object.keys(data).sort().join(',') !== 'height,instance,type,v' || data.v !== 1 || data.type !== 'staywidget:resize' || data.instance !== instance) return;
         if (!Number.isInteger(data.height) || data.height < 320 || data.height > 1600 || performance.now() - last < 100) return;
-        last = performance.now(); frame.height = String(data.height);
+        last = performance.now(); frame.height = String(Math.min(640, data.height));
       });
       frame.addEventListener('load', () => {
         last = -Infinity;

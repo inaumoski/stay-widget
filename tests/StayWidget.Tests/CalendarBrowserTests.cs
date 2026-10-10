@@ -21,6 +21,18 @@ public sealed class CalendarBrowserTests(TestDatabase fixture):IClassFixture<Tes
             using var pw=await Playwright.CreateAsync();await using var browser=await pw.Chromium.LaunchAsync(new(){Headless=true});
             await using var context=await browser.NewContextAsync(new(){IgnoreHTTPSErrors=true,ViewportSize=new(){Width=390,Height=844}});var page=await context.NewPageAsync();await page.GotoAsync(app+"/Demo");
             var demo=page.Locator("[data-staywidget=demo] iframe").ContentFrame;await demo.GetByRole(AriaRole.Table).WaitForAsync();
+            var frame=page.Locator("[data-staywidget=demo] iframe");
+            await page.WaitForFunctionAsync("()=>Number(document.querySelector('[data-staywidget=demo] iframe').height)<=640");
+            var arrivalBox=(await demo.Locator("#Arrival").BoundingBoxAsync())!;var departureBox=(await demo.Locator("#Departure").BoundingBoxAsync())!;
+            Assert.True(Math.Abs(arrivalBox.Y-departureBox.Y)<2);Assert.True(departureBox.X>=arrivalBox.X+arrivalBox.Width);
+            Assert.True(await demo.Locator("body").EvaluateAsync<bool>("()=>document.documentElement.scrollHeight>innerHeight"));
+            await demo.GetByRole(AriaRole.Link,new(){Name="Reservation agreements and terms of use (draft)"}).FocusAsync();
+            Assert.True(await demo.Locator("body").EvaluateAsync<bool>("()=>scrollY>0"));Assert.True((await frame.BoundingBoxAsync())!.Height<=640);
+            await demo.Locator("#Arrival").ScrollIntoViewIfNeededAsync();Directory.CreateDirectory(Path.Combine(root,"artifacts/qa"));await page.ScreenshotAsync(new(){Path=Path.Combine(root,"artifacts/qa/compact-widget-mobile.png"),FullPage=true});
+            await page.SetViewportSizeAsync(320,800);
+            Assert.True(await demo.Locator("body").EvaluateAsync<bool>("()=>document.documentElement.scrollWidth<=innerWidth+1"));
+            Assert.True(Math.Abs((await demo.Locator("#Arrival").BoundingBoxAsync())!.Y-(await demo.Locator("#Departure").BoundingBoxAsync())!.Y)<2);
+            await page.SetViewportSizeAsync(390,844);
             Assert.Equal(AvailabilityCalendar.DemoCottageId.ToString(),await demo.GetByLabel("Accommodation",new(){Exact=true}).InputValueAsync());
             Assert.Equal(2,await demo.GetByLabel("Accommodation",new(){Exact=true}).Locator("option").CountAsync());Assert.DoesNotContain(" A",string.Join(" ",await demo.Locator(".available-night button").AllTextContentsAsync()));
             async Task Go(DateOnly day)

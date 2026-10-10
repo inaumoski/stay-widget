@@ -62,7 +62,7 @@ public sealed class EmbedBrowserTests(TestDatabase fixture) : IClassFixture<Test
             await using(var db=fixture.Db())Assert.False(await db.Requests.AnyAsync(x=>x.PropertyId==propertyId));
             Assert.Equal("Embed Guest",await first.GetByLabel("Name",new(){Exact=true}).InputValueAsync());await first.Locator("input[name=Website]").EvaluateAsync("el=>el.value=''");
             await first.GetByRole(AriaRole.Button,new(){Name="Send reservation request"}).ClickAsync();await Assertions.Expect(first.GetByRole(AriaRole.Heading,new(){Name="Request received — awaiting approval"})).ToBeVisibleAsync();
-            var receiptHeight=await first.Locator("body").EvaluateAsync<int>("b=>Math.max(320,Math.min(1600,Math.ceil(b.getBoundingClientRect().height)))");
+            var receiptHeight=await first.Locator("body").EvaluateAsync<int>("b=>Math.max(320,Math.min(640,Math.ceil(b.getBoundingClientRect().height)))");
             await Assertions.Expect(page.Locator("iframe").Nth(0)).ToHaveAttributeAsync("height",receiptHeight.ToString());
             var privateLink=await first.GetByRole(AriaRole.Link,new(){Name="Open private status and actions"}).GetAttributeAsync("href");
             var secrets=new Uri(privateLink!).Fragment[1..].Split('.');
