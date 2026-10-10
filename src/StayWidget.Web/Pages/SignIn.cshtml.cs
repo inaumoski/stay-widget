@@ -17,5 +17,7 @@ public sealed class SignInModel(IConfiguration config, IWebHostEnvironment env, 
         await HttpContext.SignInAsync(CookieAuthenticationDefaults.AuthenticationScheme, new ClaimsPrincipal(new ClaimsIdentity([new Claim("staywidget:user", id.ToString()), new Claim(ClaimTypes.Name, owner)], CookieAuthenticationDefaults.AuthenticationScheme)));
         return Redirect("/Owner");
     }
-    public async Task<IActionResult> OnPostLogout() { await HttpContext.SignOutAsync(CookieAuthenticationDefaults.AuthenticationScheme); return Redirect("/"); }
+    public IActionResult OnPostLogout() => Enabled
+        ? SignOut(new AuthenticationProperties { RedirectUri = "/" }, CookieAuthenticationDefaults.AuthenticationScheme, "Funtoolio")
+        : SignOut(new AuthenticationProperties { RedirectUri = "/" }, CookieAuthenticationDefaults.AuthenticationScheme);
 }

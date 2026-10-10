@@ -47,12 +47,24 @@ builder.Services.AddDataProtection().SetApplicationName("StayWidget").PersistKey
 builder.Services.AddRazorPages(o => { o.Conventions.AuthorizeFolder("/Owner"); o.Conventions.AddPageRoute("/Request", "/w/{id:guid}"); });
 var auth = builder.Services.AddAuthentication(CookieAuthenticationDefaults.AuthenticationScheme).AddCookie(o => { o.Cookie.Name = "StayWidget.Owner"; o.Cookie.HttpOnly = true; o.Cookie.SecurePolicy = CookieSecurePolicy.Always; o.Cookie.SameSite = SameSiteMode.Lax; o.LoginPath = "/SignIn"; o.ExpireTimeSpan = TimeSpan.FromHours(8); });
 var enabled = builder.Configuration.GetValue<bool>("Authentication:Enabled");
+var formActions = "'self'";
+if (enabled)
+{
+    if (!Uri.TryCreate(builder.Configuration["Authentication:Issuer"], UriKind.Absolute, out var issuer)
+        || issuer.Scheme != Uri.UriSchemeHttps || issuer.UserInfo.Length != 0 || issuer.Query.Length != 0 || issuer.Fragment.Length != 0)
+        throw new InvalidOperationException("Authentication:Issuer must be an absolute HTTPS issuer URL.");
+    // Chromium checks form-action across logout redirects, including the trusted issuer.
+    formActions += " " + issuer.GetLeftPart(UriPartial.Authority);
+}
 if (!builder.Environment.IsDevelopment() && !enabled) throw new InvalidOperationException("Production requires configured Funtoolio authentication.");
 if (!builder.Environment.IsDevelopment() && builder.Configuration.GetValue("StayWidget:DevelopmentLogin",false)) throw new InvalidOperationException("Development login must be disabled outside Development.");
 if (enabled) auth.AddOpenIdConnect("Funtoolio", o =>
 {
     o.Authority = builder.Configuration["Authentication:Issuer"]; o.ClientId = builder.Configuration["Authentication:ClientId"]; o.ClientSecret = builder.Configuration["Authentication:ClientSecret"];
     o.ResponseType = "code"; o.UsePkce = true; o.SaveTokens = false; o.MapInboundClaims = false; o.CallbackPath = "/signin-funtoolio";
+    o.SignedOutCallbackPath = "/signout-callback-oidc";
+    // Tokens aren't retained in the session; identify the registered logout client explicitly.
+    o.Events.OnRedirectToIdentityProviderForSignOut = c => { c.ProtocolMessage.ClientId = c.Options.ClientId; return Task.CompletedTask; };
     o.Scope.Clear(); o.Scope.Add("openid"); o.Scope.Add("profile"); o.TokenValidationParameters.NameClaimType = "name";
     o.Events.OnRedirectToIdentityProvider = c => { c.ProtocolMessage.SetParameter("acr_values", "google"); c.ProtocolMessage.SetParameter("theme", "light"); return Task.CompletedTask; };
     o.Events.OnTokenValidated = async c =>
@@ -92,7 +104,7 @@ app.UseHttpsRedirection();
 app.Use(async (c, next) =>
 {
     const string ancestors = "'none'";
-    c.Response.Headers["Content-Security-Policy"] = $"default-src 'self'; script-src 'self'; style-src 'self'; frame-ancestors {ancestors}; base-uri 'none'; form-action 'self'; object-src 'none'";
+    c.Response.Headers["Content-Security-Policy"] = $"default-src 'self'; script-src 'self'; style-src 'self'; frame-ancestors {ancestors}; base-uri 'none'; form-action {formActions}; object-src 'none'";
     if (ancestors == "'none'") c.Response.Headers["X-Frame-Options"] = "DENY";
     c.Response.Headers["X-Content-Type-Options"] = "nosniff"; c.Response.Headers["Referrer-Policy"] = "no-referrer";
     c.Response.Headers["Cache-Control"] = "no-store";
