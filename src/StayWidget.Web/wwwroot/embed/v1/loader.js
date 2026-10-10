@@ -7,7 +7,8 @@
   const ids = /^[a-f0-9]{8}-[a-f0-9]{4}-[a-f0-9]{4}-[a-f0-9]{4}-[a-f0-9]{12}$/i;
   function scan() {
     for (const container of [...document.querySelectorAll('[data-staywidget]')].slice(0, 10)) {
-      if (container.dataset.staywidgetReady || !ids.test(container.dataset.staywidget)) continue;
+      const demo = container.dataset.staywidget === 'demo';
+      if (container.dataset.staywidgetReady || (!demo && !ids.test(container.dataset.staywidget))) continue;
       const instance = [...crypto.getRandomValues(new Uint8Array(16))].map(x => x.toString(16).padStart(2, '0')).join('');
       const frame = document.createElement('iframe');
       frame.title = 'Reservation requests';
@@ -16,7 +17,7 @@
       frame.referrerPolicy = 'no-referrer';
       frame.setAttribute('sandbox', 'allow-scripts allow-same-origin allow-forms allow-popups allow-popups-to-escape-sandbox');
       frame.dataset.staywidgetInstance = instance;
-      frame.src = `${origin}/w/${container.dataset.staywidget}?InstanceId=${instance}`;
+      frame.src = `${origin}/${demo ? 'demo-widget' : 'w/' + container.dataset.staywidget}?InstanceId=${instance}`;
       let last = -Infinity;
       window.addEventListener('message', event => {
         const data = event.data;

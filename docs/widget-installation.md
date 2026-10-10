@@ -51,6 +51,8 @@ Provider guidance checked 10 October 2026: [WordPress Custom HTML](https://wordp
 
 ## Requests and private links
 
+The public `/Demo` page now embeds a working synthetic widget through the same v1 loader using `data-staywidget="demo"`. Its `/demo-widget` frame is self-origin only, noindex and stateless: dates/guest count are validated, contact details are not collected, and simulated request/owner confirmation writes no database records or guest cookies. The page shows a copyable demo snippet and hosted fallback. Customer websites must use their own generated property UUID and approved origins; the demo identifier does not permit external framing or grant real inventory access.
+
 “Request received” means pending, not confirmed. Pending requests do not reserve dates. The owner must check the dashboard daily and contact guests using the supplied phone details; this release sends no email. Guests must save the private link shown on the receipt. It grants access to private information: anyone with the complete link can use its scoped permissions.
 
 New private links carry independent view/action capabilities in the URL fragment. The guest page offers a view-only link when sharing status without action access. Older links remain view-only. Withdrawal requires explicit confirmation and applies only while pending. A cancellation request flags a confirmed reservation for owner review; it does not release dates. The owner can keep or cancel a reservation and revoke guest links. Links also expire; suspension and data redaction prevent access. GET requests never perform these actions.

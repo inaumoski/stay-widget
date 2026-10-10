@@ -59,7 +59,7 @@ builder.Services.AddRateLimiter(o =>
     o.RejectionStatusCode = 429;
     o.OnRejected = async (c, token) => { c.HttpContext.Response.Headers.RetryAfter = "60"; c.HttpContext.Response.ContentType = "text/plain"; await c.HttpContext.Response.WriteAsync("Too many requests. Retry in one minute, use your saved status link or contact the property. No new reservation request was created by this rejected attempt.", token); };
     o.GlobalLimiter = PartitionedRateLimiter.Create<HttpContext, string>(c =>
-        c.Request.Path.StartsWithSegments("/w") || c.Request.Path.StartsWithSegments("/request") || c.Request.Path.StartsWithSegments("/api/guest") || c.Request.Path.StartsWithSegments("/api/widget")
+        c.Request.Path.StartsWithSegments("/w") || c.Request.Path.StartsWithSegments("/demo-widget") || c.Request.Path.StartsWithSegments("/request") || c.Request.Path.StartsWithSegments("/api/guest") || c.Request.Path.StartsWithSegments("/api/widget")
         ? RateLimitPartition.GetFixedWindowLimiter("guest-global", _ => new FixedWindowRateLimiterOptions { PermitLimit = 500, Window = TimeSpan.FromMinutes(1), QueueLimit = 0 })
         : RateLimitPartition.GetNoLimiter("owner-and-static"));
     o.AddPolicy("guest", c => RateLimitPartition.GetFixedWindowLimiter(c.RequestServices.GetRequiredService<SubmissionGuard>().Identity(c.Connection.RemoteIpAddress?.ToString() ?? "unknown"),
@@ -100,6 +100,7 @@ app.Use(async (c, next) =>
 {
     var ancestors = "'none'";
     var segments = c.Request.Path.Value?.Split('/', StringSplitOptions.RemoveEmptyEntries) ?? [];
+    if(c.Request.Path == "/demo-widget") ancestors = "'self'";
     if (segments.Length == 2 && segments[0] == "w" && Guid.TryParse(segments[1], out var propertyId))
     {
         var db = c.RequestServices.GetRequiredService<StayDb>();

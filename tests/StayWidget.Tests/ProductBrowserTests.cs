@@ -30,7 +30,15 @@ public sealed class ProductBrowserTests(TestDatabase fixture):IClassFixture<Test
                 Assert.Equal(1,await page.GetByRole(AriaRole.Navigation,new(){Name="More from this ecosystem"}).CountAsync());
                 Assert.True(await page.EvaluateAsync<bool>("document.documentElement.scrollWidth<=innerWidth+1"));
             }
-            await page.GotoAsync(app+"/Demo");await page.GetByRole(AriaRole.Button,new(){Name="Simulate reservation request"}).ClickAsync();await Assertions.Expect(page.GetByRole(AriaRole.Heading,new(){Name="Request received — Pending"})).ToBeVisibleAsync();await page.GetByRole(AriaRole.Button,new(){Name="Simulate owner confirmation"}).ClickAsync();await Assertions.Expect(page.GetByRole(AriaRole.Heading,new(){Name="Confirmed — sample dates unavailable"})).ToBeVisibleAsync();
+            await page.GotoAsync(app+"/Demo");
+            var embedded=page.Locator("[data-staywidget=demo] iframe");await embedded.WaitForAsync();var demo=embedded.ContentFrame;
+            await demo.GetByRole(AriaRole.Button,new(){Name="Try a reservation request"}).ClickAsync();await Assertions.Expect(demo.GetByRole(AriaRole.Heading,new(){Name="Request received — Pending"})).ToBeVisibleAsync();
+            await demo.GetByRole(AriaRole.Button,new(){Name="Simulate owner confirmation"}).ClickAsync();await Assertions.Expect(demo.GetByRole(AriaRole.Heading,new(){Name="Confirmed — demonstration only"})).ToBeVisibleAsync();
+            Assert.True(int.Parse((await embedded.GetAttributeAsync("height"))!) is >=320 and <=1600);Assert.DoesNotContain("More from this ecosystem",await demo.Locator("body").InnerTextAsync());
+            var demoResponse=await http.GetAsync(app+"/demo-widget");Assert.Contains("'self'",demoResponse.Headers.GetValues("Content-Security-Policy").Single());Assert.Contains("noindex",demoResponse.Headers.GetValues("X-Robots-Tag").Single());Assert.False(demoResponse.Headers.Contains("Set-Cookie"));
+            Directory.CreateDirectory(Path.Combine(root,"artifacts/qa"));await page.ScreenshotAsync(new(){Path=Path.Combine(root,"artifacts/qa/demo-embed-mobile.png"),FullPage=true});
+            await page.Locator("summary").ClickAsync();Assert.Contains("data-staywidget=\"demo\"",await page.Locator("#demo-snippet").InputValueAsync());
+            await page.GetByRole(AriaRole.Button,new(){Name="Simulate reservation request"}).ClickAsync();await Assertions.Expect(page.GetByRole(AriaRole.Heading,new(){Name="Request received — Pending"})).ToBeVisibleAsync();await page.GetByRole(AriaRole.Button,new(){Name="Simulate owner confirmation"}).ClickAsync();await Assertions.Expect(page.GetByRole(AriaRole.Heading,new(){Name="Confirmed — sample dates unavailable"})).ToBeVisibleAsync();
             await using(var check=fixture.Db()){Assert.False(await check.Requests.AnyAsync());Assert.False(await check.Reservations.AnyAsync());}
             Assert.Empty(external);var sitemap=await http.GetStringAsync(app+"/sitemap.xml");Assert.DoesNotContain("Owner",sitemap);Assert.DoesNotContain("GuestStatus",sitemap);Assert.DoesNotContain("request/",sitemap);Assert.DoesNotContain("Privacy",sitemap);
             foreach(var path in new[]{"/Privacy","/Terms","/Contact","/GuestStatus"}){var r=await http.GetAsync(app+path);Assert.Contains("noindex",r.Headers.GetValues("X-Robots-Tag").Single());}
