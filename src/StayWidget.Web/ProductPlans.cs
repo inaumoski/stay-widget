@@ -6,6 +6,7 @@ namespace StayWidget.Web;
 public static class ProductPlans
 {
     public const int StoredUnitLimit = 5;
+    public const string ProposedProPrice = "US $15/month per property";
     public static readonly DateTimeOffset PromotionEnd = new(2027, 2, 1, 0, 0, 0, TimeSpan.Zero);
     public static int ActiveLimit(Property p) => p.Plan == "Free" ? 1 : 5;
     public static bool ShowBranding(Property p) => p.Plan == "Free" || !p.HideBranding;

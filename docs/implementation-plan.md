@@ -293,7 +293,7 @@ Follow the linked pricing skill rather than duplicate entitlement algorithms. St
 
 | Resource / feature | Free | Pro | Custom |
 | --- | --- | --- | --- |
-| Proposed standard SaaS price | $0 | US $9/month per property; annual plan deferred | Contact for a quote |
+| Proposed standard SaaS price | $0 | US $15/month per property; annual plan deferred | Contact for a quote |
 | Properties / owners | 1 / 1 | 1 / 1 | Still single-property v1; no implied multi-property platform |
 | Active rentable units | 1 | 5 | Negotiated bounded limit, initially propose maximum 10 only after capacity review |
 | Requests | No monthly commercial cap; published safety limits apply | Same | Individually assessed, no unlimited promise |
@@ -492,7 +492,7 @@ These questions are for owner review of a concrete plan, not a prerequisite to p
 2. **No-email communication:** approve required name/phone, guest-saved status link and daily owner dashboard checking for the first pilot? Recommended yes for the requested scope; if receipt/decision email is essential, move F3 into release scope explicitly.
 3. **Public location:** which origin should serve StayWidget, and should `funtoolio.com/staywidget/` be the real attribution landing page? Recommend a dedicated chosen product subdomain plus the portfolio landing page. Local M1 does not need a public DNS decision; embed/launch does.
 4. **Development dependencies:** authorize a dedicated local StayWidget PostgreSQL database and distinct Funtoolio OIDC development client as part of a later M1 task, or supply existing isolated configuration? Recommend dedicated development resources; no sibling credentials or issuer changes inferred.
-5. **Offer:** approve Free 1 unit, Pro 5 units with proposed US $9/month standard price, promotional default Pro and no paid checkout yet? Recommended starting hypothesis; preserve the portfolio free-extension/no-auto-downgrade policy.
+5. **Offer:** approve Free 1 unit, Pro 5 units with proposed US $15/month standard price, promotional default Pro and no paid checkout yet? Recommended starting hypothesis; preserve the portfolio free-extension/no-auto-downgrade policy.
 6. **Pilot/operator scope:** which property market/jurisdiction and first website platform should launch use, and what real operator/important-contact route will be published? Recommend one verified plain HTML or self-hosted WordPress pilot, with Wix separately tested. Required before real guest intake/legal publication, not optional market interviews.
 
 The original planning task stopped for review. The owner subsequently authorized starting M1 and explicitly approved its distinct local auth client; status is the source of truth for actual progress and authorization. Future milestones remain bounded by their scope. The owner subsequently authorized committing and pushing M1 to `inaumoski/stay-widget`. No current authorization covers paid provider accounts, external mail, production access/infrastructure, deployment or PR. See the current implementation status and subsequent milestone record below for the next bounded task.

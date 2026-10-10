@@ -4,7 +4,8 @@
 <a href="/Owner">← Dashboard</a><h1>Plan and usage</h1><p>@Model.Offer</p>
 <p>@Model.Property.Plan · @Model.Active open units / @ProductPlans.ActiveLimit(Model.Property) plan limit · @Model.Stored stored units / @ProductPlans.StoredUnitLimit safety limit (including closed drafts).</p>
 @if(Model.Active>ProductPlans.ActiveLimit(Model.Property)){<p class="error">Existing units and bookings are preserved above this limit. You can manage, cancel and export them; further opening of closed units is blocked until usage is reduced or Pro selected.</p>}
-<p>No checkout or charges. Pro's proposed future standard price is US $9/month per property; tax treatment and billing are not finalized. <a href="/Pricing">Compare offers</a> · <a href="/Owner/Feedback?kind=Custom">Discuss Custom requirements</a></p>
+<p>No checkout or charges. Pro's proposed future standard price is @ProductPlans.ProposedProPrice; tax treatment and billing are not finalized. <a href="/Pricing">Compare offers</a> · <a href="/Owner/Feedback?kind=Custom">Discuss Custom requirements</a></p>
+<p>Confirmation email has shared sending safeguards, not a monthly reservation quota. Delivery delays never cancel a saved reservation. <a href="/Terms">Service terms</a>.</p>
 <div asp-validation-summary="All" role="alert" class="error"></div><form method="post" class="card"><input asp-for="Revision" type="hidden"/>
 <label asp-for="Plan">Plan preference</label><select asp-for="Plan"><option>Pro</option><option>Free</option></select>
 <label class="check"><input asp-for="HideBranding"/> Remove widget branding (Pro entitlement only)</label>
