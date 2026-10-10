@@ -5,6 +5,7 @@ M3 local-preview guide, checked 10 October 2026. This preview is not ready for l
 ## Configure and copy
 
 1. Sign in, configure your property/public contact and policies, and add individually named units. Open requests deliberately. Record outside bookings and unavailable dates manually: there is no external calendar sync.
+   Publish your accommodation prices on your own website before installing the widget. Guests refer to that website for prices and agree the final total and terms with you before confirmation. StayWidget does not calculate a guest price quote; its subscription plans are separate from your accommodation prices.
 2. Open **Install widget** from the owner dashboard. Enter up to five exact website origins, such as `https://www.example.com`, and acknowledge your installation authority. Include scheme, hostname and nondefault port; www/non-www are distinct. Paths, credentials, queries and wildcards are rejected. Production requires HTTPS. This is owner attestation, not verified domain ownership.
 3. Choose a dark accent. White button text must meet 4.5:1 contrast. The current language is English and owner agreement records use EUR; no automated accommodation quote is provided.
 4. Leave **Show availability calendar in the widget** selected (the default), or clear it to use date fields/search only. Save installation settings.

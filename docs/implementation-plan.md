@@ -524,3 +524,7 @@ Owner setup should fill a chosen calendar year or November–December range, wit
 ## Approved follow-up: guest confirmation email
 
 The owner requested confirmation email with a cancellation link and automatic unavailability on owner acceptance, then selected noreply@funtoolie.com and inclusion of owner contact details. Add email capture, a transactionally queued encrypted confirmation intent, Brevo transactional delivery and a private development sink. Reuse existing private guest cancellation-request permissions and owner policy review; confirmed inventory stays occupied until owner cancellation. Verify missing keys, retries, concurrent dispatch, daily budgets and restore behavior without real recipients. Pending/owner/rejection/update notifications and payments remain deferred. Details and live configuration prerequisites are in [email setup](email.md).
+
+## Accommodation pricing clarification
+
+Owners are expected to publish accommodation prices on their own website before installing the widget. Guest-facing wording refers visitors to that website and explains that StayWidget does not calculate a price quote. The owner and guest still agree the final total and terms before confirmation. StayWidget subscription prices are separate from accommodation rates. This clarification adds no rate engine, quote calculation or payment flow.

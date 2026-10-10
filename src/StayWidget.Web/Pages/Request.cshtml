@@ -3,6 +3,7 @@
 @{ViewData["Title"]="Request a stay";if(Model.IsWidget){Layout="Shared/_WidgetLayout";}}
 @if(Model.IsWidget){<div id="embed-context" data-instance="@Model.InstanceId" data-origins="@System.Text.Json.JsonSerializer.Serialize(Model.ParentOrigins)"></div>}
 <p class="eyebrow">A PERSONAL WELCOME</p><h1>@Model.Property.Name</h1><p>Choose an individual unit and request a stay. Outside bookings must be maintained manually by the property.</p><p>Submitting an enquiry does not reserve dates. The property agrees price and terms with you before confirming. @Model.EmailNotice</p>
+<p>For accommodation prices, refer to the property's own website. StayWidget does not calculate a price quote. Agree the final total and terms with the property before confirmation.</p>
 <div asp-validation-summary="All" class="error" role="alert"></div>
 @if(Model.Receipt is not null){<section class="card"><h2>@(Model.ReceiptStatus?.State=="Accepted"?"Reservation confirmed":Model.ReceiptStatus?.State=="Pending"?"Request received — awaiting approval":Model.ReceiptStatus?.State??"Request received")</h2><p>Your request was saved. Open and save your private link to check the owner's decision or manage this enquiry. @Model.EmailNotice</p><a class="button" href="@Model.ReceiptLink" target="_blank" rel="noopener">Open private status and actions</a><p>Anyone holding this link can view the enquiry, withdraw it while pending or request cancellation after confirmation. A cancellation request does not release booked dates.</p><p>Property contact: @Model.Property.Contact</p></section>}
 else{

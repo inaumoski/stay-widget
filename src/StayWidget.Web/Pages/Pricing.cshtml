@@ -1,7 +1,9 @@
 @page
 @inject TimeProvider Clock
 @{ViewData["Title"]="Free, Pro and Custom plans"; ViewData["Description"]="A useful Free plan for one unit, free launch Pro for five units, and Custom requirements. No checkout or automatic charges.";}
-<p class="eyebrow">ONE PROPERTY. SMALL, CLEAR PLANS.</p><h1>Start with free Pro access.</h1><p>@ProductPlans.Offer(Clock.GetUtcNow())</p>
+<p class="eyebrow">ONE PROPERTY. SMALL, CLEAR PLANS.</p><h1>Start with free Pro access.</h1>
+<p>These plans are for StayWidget. Property owners are expected to publish their accommodation prices on their own website; the widget does not calculate guest price quotes.</p>
+<p>@ProductPlans.Offer(Clock.GetUtcNow())</p>
 <div class="columns plan-cards"><section class="card"><h2>Free</h2><p class="price">$0</p><p>One property, one owner, one open rentable unit.</p><p>Core requests, manual inventory, calendar and CSV export. Visible StayWidget and Funtoolio attribution.</p><a class="button secondary" href="/Owner/Plans">Choose Free</a></section>
 <section class="card"><h2>Pro</h2><p class="price">Free early access</p><p>One property, one owner, five open units. Removable branding.</p><p>Proposed future standard price: <strong>US $9/month per property</strong>. Annual offer and tax treatment are not finalized. Checkout is unavailable.</p><a class="button" href="/Owner">Start free Pro</a></section>
 <section class="card"><h2>Custom</h2><p class="price">Contact for a quote</p><p>Discuss bounded requirements for one property. Larger limits require review and an explicit agreement; the current preview still stores at most five units.</p><p>No promised bespoke work, SLA, priority support, multi-property access or unsupported integrations.</p><a class="button secondary" href="/Owner/Feedback?kind=Custom">Send requirements (sign in)</a></section></div>

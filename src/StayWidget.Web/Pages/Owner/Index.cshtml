@@ -10,6 +10,7 @@
 <label asp-for="Policies">Booking and cancellation policies</label><textarea asp-for="Policies" minlength="10" maxlength="4000" required></textarea>
 <label asp-for="UnitName">Unit name</label><input asp-for="UnitName" placeholder="Garden Cottage" maxlength="100" required/>
 <label asp-for="Capacity">Maximum guests</label><input asp-for="Capacity" type="number" min="1" max="20" required/>
+<p>You are expected to publish accommodation prices on your own website before installing the widget. StayWidget does not calculate guest price quotes.</p>
 <label class="check"><input type="checkbox" name="understand" value="true" required/> I will check requests daily, maintain outside availability and agree price and terms directly before confirmation. @Model.EmailNotice</label>
 <button>Create property and unit</button></form></section>
 }else{
