@@ -17,8 +17,20 @@ public static class AvailabilityCalendar
             nights.Add(new(d,unit.Enabled && guests<=unit.Capacity && d>today && d<=today.AddDays(365) && d>=unit.OpenFrom && d<unit.OpenTo && !periods.Any(p=>p.Start<=d && d<p.End)));
         return new(month,first,last,nights);
     }
-    public static Unit DemoUnit(DateOnly today)=>new(){Name="Garden Cottage",Capacity=2,OpenFrom=today.AddDays(1),OpenTo=today.AddDays(91)};
-    public static (DateOnly Start,DateOnly End) DemoBlock(DateOnly today)=>(today.AddDays(14),today.AddDays(17));
+    public static readonly Guid DemoCottageId = new("11111111-1111-4111-8111-111111111111");
+    public static readonly Guid DemoApartmentId = new("22222222-2222-4222-8222-222222222222");
+    public static Unit DemoUnit(DateOnly today,Guid? unitId=null)
+    {
+        var id=unitId??DemoCottageId;
+        if(id!=DemoCottageId && id!=DemoApartmentId)throw new RuleViolation("Choose a sample accommodation.");
+        return new(){Id=id,Name=id==DemoCottageId?"Garden Cottage":"Sunny Apartment",Capacity=id==DemoCottageId?2:4,OpenFrom=today.AddDays(1),OpenTo=today.AddDays(91)};
+    }
+    public static Unit[] DemoUnits(DateOnly today)=>[DemoUnit(today,DemoCottageId),DemoUnit(today,DemoApartmentId)];
+    public static (DateOnly Start,DateOnly End) DemoBlock(DateOnly today,Guid? unitId=null)
+    {
+        var unit=DemoUnit(today,unitId);var offset=unit.Id==DemoCottageId?14:7;
+        return(today.AddDays(offset),today.AddDays(offset+3));
+    }
 }
 public sealed partial class BookingService
 {

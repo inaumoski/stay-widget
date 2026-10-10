@@ -73,7 +73,7 @@
         if (!/^\d{4}-\d{2}-\d{2}$/.test(night.date) || typeof night.available !== 'boolean') throw new Error('Invalid night');
         if (cells === 7) { row = body.insertRow(); cells = 0; }
         const cell = row.insertCell(); cells++;
-        const text = date(night.date).getUTCDate() + (night.available ? ' A' : ' ×');
+        const text = String(date(night.date).getUTCDate()) + (night.available ? '' : ' ×');
         cell.className = night.available ? 'available-night' : 'unavailable-night';
         cell.dataset.night = night.date; cell.dataset.available = String(night.available);
         const button = document.createElement('button'); button.type = 'button'; button.append(document.createTextNode(text));

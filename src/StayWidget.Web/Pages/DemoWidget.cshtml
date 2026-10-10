@@ -1,20 +1,21 @@
 @page "/demo-widget"
 @model StayWidget.Web.Pages.DemoWidgetModel
 @{Layout=null;}
-<!doctype html><html lang="en"><head><meta charset="utf-8"/><meta name="viewport" content="width=device-width,initial-scale=1"/><title>Garden Cottage · synthetic widget demo</title><link rel="stylesheet" href="/site.css"/></head>
-<body class="widget"><main><p class="eyebrow">SYNTHETIC DEMO — NO REAL BOOKING</p><h1>Garden Cottage</h1><p>One cottage · up to two guests. No contact details collected, no saved requests, no email or payments.</p>
+<!doctype html><html lang="en"><head><meta charset="utf-8"/><meta name="viewport" content="width=device-width,initial-scale=1"/><title>Demo Guesthouse · synthetic widget demo</title><link rel="stylesheet" href="/site.css"/></head>
+<body class="widget"><main><p class="eyebrow">SYNTHETIC DEMO — NO REAL BOOKING</p><h1>Demo Guesthouse</h1><p>Two sample units with separate availability and guest capacities. No contact details collected, no saved requests, no email or payments.</p>
 <div asp-validation-summary="All" role="alert" class="error"></div>
 @if(Model.Stage=="Search"){
 <form method="post" asp-antiforgery="false" action="/demo-widget?handler=Request&amp;InstanceId=@Model.InstanceId" class="card">
-<partial name="Shared/_AvailabilityCalendar" model="@(new StayWidget.Web.CalendarView("/api/demo/calendar","",1,Model.CalendarMonth))"/>
+<label asp-for="UnitId">Accommodation</label><select asp-for="UnitId">@foreach(var u in Model.Units){<option value="@u.Id" data-min-nights="@u.MinNights">@u.Name · up to @u.Capacity guests</option>}</select>
+<partial name="Shared/_AvailabilityCalendar" model="@(new StayWidget.Web.CalendarView("/api/demo/calendar",Model.UnitId.ToString(),1,Model.CalendarMonth))"/>
 <label asp-for="Arrival">Check-in</label><input asp-for="Arrival" type="date" required/>
 <label asp-for="Departure">Check-out</label><input asp-for="Departure" type="date" required/>
-<label asp-for="Guests">Guests</label><input asp-for="Guests" type="number" min="1" max="2" required/>
+<label asp-for="Guests">Guests</label><input asp-for="Guests" type="number" min="1" max="4" required/>
 <p>Sample availability only. Pending requests do not hold dates. The owner agrees price and terms before confirming.</p><button>Try a reservation request</button></form>
 }else if(Model.Stage=="Pending"){
-<section class="card" role="status"><h2>Request received — Pending</h2><p>@Model.Arrival → @Model.Departure · @Model.Guests guests. This is not a confirmed reservation.</p><p>A real receipt includes a private status link. This demonstration saves nothing.</p><form method="post" asp-antiforgery="false" action="/demo-widget?handler=Confirm&amp;InstanceId=@Model.InstanceId"><input asp-for="Arrival" type="hidden"/><input asp-for="Departure" type="hidden"/><input asp-for="Guests" type="hidden"/><button>Simulate owner confirmation</button></form></section>
+<section class="card" role="status"><h2>Request received — Pending</h2><p>@Model.UnitName · @Model.Arrival → @Model.Departure · @Model.Guests guests. This is not a confirmed reservation.</p><p>A real receipt includes a private status link. This demonstration saves nothing.</p><form method="post" asp-antiforgery="false" action="/demo-widget?handler=Confirm&amp;InstanceId=@Model.InstanceId"><input asp-for="UnitId" type="hidden"/><input asp-for="Arrival" type="hidden"/><input asp-for="Departure" type="hidden"/><input asp-for="Guests" type="hidden"/><button>Simulate owner confirmation</button></form></section>
 }else{
-<section class="card" role="status"><h2>Confirmed — demonstration only</h2><p>In the real product, confirmation rechecks inventory atomically and makes these nights unavailable. Outside bookings must still be entered manually.</p></section>
+<section class="card" role="status"><h2>Confirmed — demonstration only</h2><p>@Model.UnitName · @Model.Arrival → @Model.Departure · @Model.Guests guests.</p><p>In the real product, confirmation rechecks inventory atomically and makes these nights unavailable for this unit. Other units keep their own availability. Outside bookings must still be entered manually.</p></section>
 }
 <a href="/demo-widget?InstanceId=@Model.InstanceId">Reset widget demo</a>
 </main><footer>Booking requests by <a href="/go/product" target="_blank" rel="sponsored noopener">StayWidget</a> · <a href="/go/portfolio" target="_blank" rel="sponsored noopener">Funtoolio</a></footer><div id="embed-context" data-instance="@Model.InstanceId" data-origins="@Model.Origins" hidden></div><script src="/availability-calendar.js" defer></script><script src="/embed/v1/child.js" defer></script></body></html>

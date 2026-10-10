@@ -532,3 +532,7 @@ Owners are expected to publish accommodation prices on their own website before 
 ## Approved follow-up: two-click calendar range selection
 
 Calendar selections alternate check-in and check-out on successive valid clicks, then restart check-in for a new range. Reject same-day/earlier check-out without consuming the second step. Highlight occupied nights and mark both endpoints; departure remains excluded. Preserve selection and click phase across month navigation/reloads, synchronize manual date fields, and offer departure-only selection of an unavailable night after arrival. The highlighted range is a selection, not an inventory hold or guarantee; existing complete-stay and confirmation checks stay authoritative. Verify keyboard, narrow iframe, repeated selections and cross-month behavior with the established browser tools.
+
+## Demo unit selector and calendar clarity
+
+Remove the visible A suffix from available day numbers; keep explicit unavailable-night markers and accessible availability labels. The stateless embedded demo must show the actual Accommodation selector above the calendar with two sample units, distinct capacities/blocked dates, unit-aware submission/confirmation validation and selected-unit labels. It remains synthetic and creates no inventory, contact records or notifications.

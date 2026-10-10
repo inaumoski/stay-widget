@@ -1,5 +1,6 @@
 using System.Diagnostics;
 using Microsoft.Playwright;
+using StayWidget.Web;
 using Xunit;
 namespace StayWidget.Tests;
 
@@ -16,9 +17,12 @@ public sealed class CalendarBrowserTests(TestDatabase fixture):IClassFixture<Tes
         {
             using var http=new HttpClient(new HttpClientHandler{ServerCertificateCustomValidationCallback=(_,_,_,_)=>true});bool ready=false;
             for(int i=0;i<60;i++){try{if((await http.GetAsync(app)).IsSuccessStatusCode){ready=true;break;}}catch(HttpRequestException){}await Task.Delay(200);}Assert.True(ready);
+            var month=AvailabilityCalendar.Month(DateOnly.FromDateTime(DateTime.UtcNow));Assert.Equal(400,(int)(await http.GetAsync(app+$"/api/demo/calendar?month={month:yyyy-MM-dd}&guests=2&unitId={Guid.NewGuid()}")).StatusCode);
             using var pw=await Playwright.CreateAsync();await using var browser=await pw.Chromium.LaunchAsync(new(){Headless=true});
             await using var context=await browser.NewContextAsync(new(){IgnoreHTTPSErrors=true,ViewportSize=new(){Width=390,Height=844}});var page=await context.NewPageAsync();await page.GotoAsync(app+"/Demo");
             var demo=page.Locator("[data-staywidget=demo] iframe").ContentFrame;await demo.GetByRole(AriaRole.Table).WaitForAsync();
+            Assert.Equal(AvailabilityCalendar.DemoCottageId.ToString(),await demo.GetByLabel("Accommodation",new(){Exact=true}).InputValueAsync());
+            Assert.Equal(2,await demo.GetByLabel("Accommodation",new(){Exact=true}).Locator("option").CountAsync());Assert.DoesNotContain(" A",string.Join(" ",await demo.Locator(".available-night button").AllTextContentsAsync()));
             async Task Go(DateOnly day)
             {
                 var target=new DateOnly(day.Year,day.Month,1);var current=DateOnly.Parse((await demo.Locator("[data-night]").First.GetAttributeAsync("data-night"))!);
@@ -50,6 +54,15 @@ public sealed class CalendarBrowserTests(TestDatabase fixture):IClassFixture<Tes
             await Assertions.Expect(Cell(across.AddDays(-1))).ToHaveClassAsync(new System.Text.RegularExpressions.Regex("selected-night"));await Go(monthEnd);await Assertions.Expect(Cell(monthEnd)).ToHaveClassAsync(new System.Text.RegularExpressions.Regex("range-start"));
             await demo.Locator("#Arrival").FillAsync(monthEnd.AddDays(-6).ToString("yyyy-MM-dd"));await demo.Locator("#Departure").FillAsync(monthEnd.AddDays(-3).ToString("yyyy-MM-dd"));await demo.Locator("#Guests").FocusAsync();
             Assert.True(await demo.Locator("body").EvaluateAsync<bool>("()=>document.documentElement.scrollWidth<=innerWidth+1"));Directory.CreateDirectory(Path.Combine(root,"artifacts/qa"));await page.ScreenshotAsync(new(){Path=Path.Combine(root,"artifacts/qa/calendar-range-mobile.png"),FullPage=true});
+            // Selecting another unit changes the same dates independently, and guest count respects capacity.
+            var cottageBlocked=today.AddDays(14);await Go(cottageBlocked);await Assertions.Expect(Cell(cottageBlocked)).ToHaveAttributeAsync("data-available","false");
+            await demo.GetByLabel("Accommodation",new(){Exact=true}).SelectOptionAsync(AvailabilityCalendar.DemoApartmentId.ToString());await Assertions.Expect(Cell(cottageBlocked)).ToHaveAttributeAsync("data-available","true");
+            await demo.Locator("#Guests").FillAsync("3");await demo.Locator("#Arrival").FocusAsync();await Assertions.Expect(Cell(cottageBlocked)).ToHaveAttributeAsync("data-available","true");
+            await demo.GetByLabel("Accommodation",new(){Exact=true}).SelectOptionAsync(AvailabilityCalendar.DemoCottageId.ToString());await Assertions.Expect(Cell(cottageBlocked)).ToHaveAttributeAsync("data-available","false");await Assertions.Expect(demo.Locator(".available-night")).ToHaveCountAsync(0);
+            await demo.GetByLabel("Accommodation",new(){Exact=true}).SelectOptionAsync(AvailabilityCalendar.DemoApartmentId.ToString());await Assertions.Expect(Cell(cottageBlocked)).ToHaveAttributeAsync("data-available","true");
+            await demo.Locator("#Arrival").FillAsync(today.AddDays(11).ToString("yyyy-MM-dd"));await demo.Locator("#Departure").FillAsync(today.AddDays(13).ToString("yyyy-MM-dd"));
+            await demo.GetByRole(AriaRole.Button,new(){Name="Try a reservation request"}).ClickAsync();await Assertions.Expect(demo.GetByRole(AriaRole.Status)).ToContainTextAsync("Sunny Apartment");
+            await demo.GetByRole(AriaRole.Button,new(){Name="Simulate owner confirmation"}).ClickAsync();await Assertions.Expect(demo.GetByRole(AriaRole.Status)).ToContainTextAsync("Sunny Apartment");await Assertions.Expect(demo.GetByRole(AriaRole.Heading,new(){Name="Confirmed — demonstration only"})).ToBeVisibleAsync();
         }
         finally {if(!server.HasExited){server.Kill(true);await server.WaitForExitAsync();}}
     }

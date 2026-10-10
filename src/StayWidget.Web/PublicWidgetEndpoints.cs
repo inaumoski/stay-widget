@@ -16,9 +16,9 @@ public static class PublicWidgetEndpoints
             try{var calendar=await service.Calendar(id,unitId,month,guests);return calendar==null?Results.NotFound():Results.Ok(calendar);}
             catch(RuleViolation e){return Results.BadRequest(new{message=e.Message});}
         }).RequireRateLimiting("guest");
-        app.MapGet("/api/demo/calendar",(DateOnly month,int guests,TimeProvider clock)=>
+        app.MapGet("/api/demo/calendar",(DateOnly month,int guests,TimeProvider clock,Guid? unitId=null)=>
         {
-            try{var today=DateOnly.FromDateTime(clock.GetUtcNow().UtcDateTime);return Results.Ok(AvailabilityCalendar.Build(AvailabilityCalendar.DemoUnit(today),today,month,guests,[AvailabilityCalendar.DemoBlock(today)]));}
+            try{var today=DateOnly.FromDateTime(clock.GetUtcNow().UtcDateTime);return Results.Ok(AvailabilityCalendar.Build(AvailabilityCalendar.DemoUnit(today,unitId),today,month,guests,[AvailabilityCalendar.DemoBlock(today,unitId)]));}
             catch(RuleViolation e){return Results.BadRequest(new{message=e.Message});}
         }).RequireRateLimiting("guest");
         app.MapGet("/api/widget/{id:guid}/configuration", async (Guid id, StayDb db) =>
