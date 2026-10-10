@@ -1,0 +1,1 @@
+<Solution><Project Path="src/StayWidget.Domain/StayWidget.Domain.csproj"/><Project Path="src/StayWidget.Persistence/StayWidget.Persistence.csproj"/><Project Path="src/StayWidget.Web/StayWidget.Web.csproj"/><Project Path="tests/StayWidget.Tests/StayWidget.Tests.csproj"/></Solution>

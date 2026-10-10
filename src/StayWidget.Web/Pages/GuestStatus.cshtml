@@ -1,0 +1,4 @@
+@page
+@{ViewData["Title"]="Your request status";}
+<p class="eyebrow">YOUR PRIVATE RECEIPT</p><h1>Reservation request status</h1><p>Save this page's private link. It lets anyone holding it view this request. No email is sent.</p><div id="status" class="card" role="status">Loading your request…</div><button id="copy" type="button">Copy private status link</button><p id="copy-result" role="status"></p><noscript>Please enable JavaScript to use your private status link, or contact the property directly.</noscript>
+@section Scripts{<script src="/guest-status.js" defer></script>}

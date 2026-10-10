@@ -1,0 +1,11 @@
+@page "/request/{id:guid}"
+@model RequestModel
+@{ViewData["Title"]="Request a stay";}
+<p class="eyebrow">A PERSONAL WELCOME</p><h1>@Model.Property.Name</h1><p>Request a stay in @Model.Unit.Name, for up to @Model.Unit.Capacity guests.</p><p>Submitting an enquiry does not reserve dates. The property agrees price and terms with you before confirming. No email is sent; save your private status link.</p>
+<div asp-validation-summary="All" class="error" role="alert"></div>
+<form method="post" asp-antiforgery="false" class="card"><input asp-for="Key" type="hidden"/><input asp-for="FormContext" type="hidden"/>
+<div class="columns"><div><label asp-for="Arrival">Check-in</label><input asp-for="Arrival" type="date" required/></div><div><label asp-for="Departure">Check-out</label><input asp-for="Departure" type="date" required/></div><div><label asp-for="Guests">Guests</label><input asp-for="Guests" type="number" min="1" max="@Model.Unit.Capacity" required/></div></div>
+<button name="action" value="Search" formnovalidate class="secondary">Check availability</button>
+@if(Model.Available.HasValue){<p role="status">@(Model.Available.Value?"These dates are available to request. They are not held.":"These dates are unavailable. Try other dates or contact the property.")</p>}
+<h2>Your contact details</h2><label asp-for="GuestName">Name</label><input asp-for="GuestName" autocomplete="name" maxlength="120" required/><label asp-for="Phone">Phone, including country code</label><input asp-for="Phone" type="tel" autocomplete="tel" maxlength="40" required/>
+<h2>Property policies</h2><p class="policies">@Model.Property.Policies</p><p>Contact: @Model.Property.Contact</p><label class="check"><input asp-for="Agree" required/> I reviewed these policies and understand this is a request awaiting approval, without a date hold or email notification.</label><button name="action" value="Submit">Send reservation request</button></form>

@@ -1,0 +1,22 @@
+@page "/Owner"
+@model StayWidget.Web.Pages.Owner.IndexModel
+@{ViewData["Title"]="Owner dashboard";}
+<p class="eyebrow">YOUR PROPERTY</p><h1>Owner dashboard</h1><div asp-validation-summary="All" class="error" role="alert"></div>
+@if(Model.Property is null){
+<section class="card"><h2>Start with one property and one unit</h2><form method="post" asp-page-handler="Setup">
+<label asp-for="PropertyName">Property name</label><input asp-for="PropertyName" maxlength="120" required/>
+<label asp-for="Contact">Public contact phone or contact instructions</label><input asp-for="Contact" maxlength="200" required/>
+<label asp-for="Zone">Property time zone</label><select asp-for="Zone"><option>Europe/Skopje</option><option>Europe/London</option><option>Europe/Berlin</option><option>America/New_York</option><option>UTC</option></select>
+<label asp-for="Policies">Booking and cancellation policies</label><textarea asp-for="Policies" minlength="10" maxlength="4000" required></textarea>
+<label asp-for="UnitName">Unit name</label><input asp-for="UnitName" placeholder="Garden Cottage" maxlength="100" required/>
+<label asp-for="Capacity">Maximum guests</label><input asp-for="Capacity" type="number" min="1" max="20" required/>
+<label class="check"><input type="checkbox" name="understand" value="true" required/> I will check requests daily, maintain outside availability and agree price and terms directly before confirmation. This preview sends no email.</label>
+<button>Create property and unit</button></form></section>
+}else{
+<section class="card"><h2>@Model.Property.Name</h2><p>@Model.Unit!.Name · up to @Model.Unit.Capacity guests · @Model.Property.Zone</p><a href="/request/@Model.Property.Id">Open guest request page</a><p>Keep outside booking records available and check them before confirming. This preview supports direct requests only.</p></section>
+<h2>Reservation requests</h2><p>Pending enquiries do not hold inventory. Check external commitments and agree the price and terms before confirmation. Amounts are recorded in EUR.</p>
+@if(Model.Requests.Count==0){<p>No requests yet. Share the guest request page to try the flow.</p>}
+@foreach(var r in Model.Requests){<article class="card"><h3>@r.Name · @r.Arrival.ToString("dd MMM yyyy") → @r.Departure.ToString("dd MMM yyyy")</h3><p>@r.Guests guest(s) · @r.Phone</p><p class="status">@(r.State=="Pending"&&Model.Now>=r.Expires?"Expired":r.State)</p><p>Decision deadline: @r.Expires.ToString("u")</p>
+@if(r.State=="Pending"&&Model.Now<r.Expires){<form method="post" asp-page-handler="Confirm"><input type="hidden" name="id" value="@r.Id"/><input type="hidden" name="revision" value="@r.Revision"/><label for="amount-@r.Id">Externally agreed total (EUR)</label><input id="amount-@r.Id" name="amount" type="number" step="0.01" min="0" max="9999999999" required/><label class="check"><input name="agreed" type="checkbox" value="true" required/> The guest and I agreed the price and property terms, and I checked outside bookings.</label><button>Confirm reservation</button></form>}
+</article>}
+}

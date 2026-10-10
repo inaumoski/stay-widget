@@ -1,0 +1,6 @@
+@page
+@model SignInModel
+@{ViewData["Title"]="Sign in";}
+<h1>Owner sign-in</h1><p>Common sign-in uses Funtoolio and Google. Guests never need an account.</p>
+@if(Model.Enabled){<p>Sign-in was cancelled or unavailable.</p><a class="button" href="/SignIn">Try Funtoolio sign-in again</a>}else{<p>Common sign-in isn't configured yet. Your administrator needs to register this app's local client.</p>}
+@if(Model.Dev){<section class="card"><h2>Local development only</h2><p>These disposable owners test separate accounts. They do not verify Google identity.</p><form method="post" asp-page-handler="Development"><button name="owner" value="Alex">Use Alex</button><button name="owner" value="Sam">Use Sam</button></form></section>}
