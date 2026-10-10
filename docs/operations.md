@@ -39,6 +39,8 @@ Production key names (set through a private service environment/config file; nev
 | `StayWidget__DataRoot` | Persistent private Data Protection key directory outside releases/wwwroot |
 | `StayWidget__BehindLoopbackProxy` | `true` only with a single trusted loopback proxy |
 | `StayWidget__DevelopmentLogin` | `false`; Production rejects true |
+| `Analytics__Enabled` | `true` in source; only exact public routes on the production origin qualify, localhost/staging remain off. Set `false` to stop Cloud tracking; see analytics.md. |
+| `Analytics__WebsiteId` | Owner-supplied public ID for the selected shared Cloud stream; no API credentials. |
 | `StayWidget__AggregateMetrics` | `false` by default; enable only after privacy/choice review |
 | `StayWidget__MaintenanceEnabled` | `true` for bounded inventory/feedback cleanup and counter flush |
 | `Authentication__Enabled` | `true` |
@@ -93,7 +95,7 @@ States are New, Reviewed, Planned, InProgress, Closed. Closure needs Closed time
 
 Optional fixed-event counts have no tenant/user identifiers, URLs, referrers or guest content. Disabled locally/unconfigured by default; DNT/GPC prevent recording when enabled. At most two days × eleven in-memory event keys and bounded daily counts flush once a minute. Flush failure/restart can lose counts; counters are approximate and never the reservation source of truth. Known bots/prefetches are filtered narrowly, not perfectly. Persisted counters expire after 90 days.
 
-Report `page-*` as page requests, `widget-view` as widget responses, `hosted-view` as fallback responses, `request-submitted` as committed-new-request events (not attempts/retries), `installation` as one owner acknowledgement, and `attribution-*` as redirect clicks. Do not infer verified installs, unique visitors, Funtoolio homepage visits or paid conversions. Paid conversions are unavailable; real billing is deferred. A bounded operator query is `SELECT "Day","Event","Count" FROM "Metrics" ORDER BY "Day" DESC,"Event" LIMIT 200;`. No public metrics dashboard or Cloud stream is added.
+Report `page-*` as page requests, `widget-view` as widget responses, `hosted-view` as fallback responses, `request-submitted` as committed-new-request events (not attempts/retries), `installation` as one owner acknowledgement, and `attribution-*` as redirect clicks. Do not infer verified installs, unique visitors, Funtoolio homepage visits or paid conversions. Paid conversions are unavailable; real billing is deferred. A bounded operator query is `SELECT "Day","Event","Count" FROM "Metrics" ORDER BY "Day" DESC,"Event" LIMIT 200;`. No public metrics dashboard is added. Owner-selected public Umami Cloud visits are separate; see [analytics setup](analytics.md).
 
 ## Confirmation email operations
 

@@ -19,6 +19,7 @@ builder.Services.AddSingleton<SubmissionGuard>();
 var publicOrigin = builder.Configuration["StayWidget:PublicOrigin"];
 if (!builder.Environment.IsDevelopment() && string.IsNullOrWhiteSpace(publicOrigin)) throw new InvalidOperationException("Production requires the canonical HTTPS StayWidget:PublicOrigin.");
 builder.Services.AddSingleton(new SiteOrigin(publicOrigin ?? "https://localhost:7259"));
+builder.Services.AddSingleton<PublicAnalytics>();
 var emailSettings = builder.Configuration.GetSection("Email").Get<EmailSettings>() ?? new EmailSettings();
 emailSettings.Validate(builder.Environment.IsDevelopment());
 if(emailSettings.Mode == "Sink")
@@ -105,6 +106,8 @@ app.Use(async (c, next) =>
 {
     const string ancestors = "'none'";
     c.Response.Headers["Content-Security-Policy"] = $"default-src 'self'; script-src 'self'; style-src 'self'; frame-ancestors {ancestors}; base-uri 'none'; form-action {formActions}; object-src 'none'";
+    if (c.RequestServices.GetRequiredService<PublicAnalytics>().CanTrack(c.Request, app.Environment))
+        c.Response.Headers["Content-Security-Policy"] = $"default-src 'self'; script-src 'self' {PublicAnalytics.ScriptUrl}; connect-src 'self' {PublicAnalytics.CollectorUrl}; style-src 'self'; frame-ancestors {ancestors}; base-uri 'none'; form-action {formActions}; object-src 'none'";
     if (ancestors == "'none'") c.Response.Headers["X-Frame-Options"] = "DENY";
     c.Response.Headers["X-Content-Type-Options"] = "nosniff"; c.Response.Headers["Referrer-Policy"] = "no-referrer";
     c.Response.Headers["Cache-Control"] = "no-store";

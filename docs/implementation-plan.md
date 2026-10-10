@@ -536,3 +536,7 @@ Calendar selections alternate check-in and check-out on successive valid clicks,
 ## Demo unit selector and calendar clarity
 
 Remove the visible A suffix from available day numbers; keep explicit unavailable-night markers and accessible availability labels. The stateless embedded demo must show the actual Accommodation selector above the calendar with two sample units, distinct capacities/blocked dates, unit-aware submission/confirmation validation and selected-unit labels. It remains synthetic and creates no inventory, contact records or notifications.
+
+## Owner-authorized analytics follow-up — 10 October 2026
+
+The subsequent request to apply the analytics skill supersedes the original no-tracking-script default for public marketing pages only. The owner supplied the existing Cloud snippet for website ID 37851bad-5d45-4228-b8f2-c1c6b44f4ab6, selecting that shared portfolio stream for StayWidget. Adopt the [analytics skill](../../funtoolio-playbook/skills/funtoolio-product-analytics/SKILL.md) and [product integration](analytics.md): exact public production routes, one sanitized manual native view, visitor opt-out/DNT/GPC, no automatic event capture, strict private/widget exclusion and local/staging off. Original milestone constraints above record the initial scope; anonymous transaction and private pages remain untracked. No provider account changes, paid upgrade, self-hosted service or production deployment are authorized by this follow-up.
