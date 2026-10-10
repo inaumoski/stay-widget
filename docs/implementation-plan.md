@@ -528,3 +528,7 @@ The owner requested confirmation email with a cancellation link and automatic un
 ## Accommodation pricing clarification
 
 Owners are expected to publish accommodation prices on their own website before installing the widget. Guest-facing wording refers visitors to that website and explains that StayWidget does not calculate a price quote. The owner and guest still agree the final total and terms before confirmation. StayWidget subscription prices are separate from accommodation rates. This clarification adds no rate engine, quote calculation or payment flow.
+
+## Approved follow-up: two-click calendar range selection
+
+Calendar selections alternate check-in and check-out on successive valid clicks, then restart check-in for a new range. Reject same-day/earlier check-out without consuming the second step. Highlight occupied nights and mark both endpoints; departure remains excluded. Preserve selection and click phase across month navigation/reloads, synchronize manual date fields, and offer departure-only selection of an unavailable night after arrival. The highlighted range is a selection, not an inventory hold or guarantee; existing complete-stay and confirmation checks stay authoritative. Verify keyboard, narrow iframe, repeated selections and cross-month behavior with the established browser tools.

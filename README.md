@@ -19,7 +19,7 @@ M3 adds an isolated iframe with an optional resizing JavaScript loader, owner in
 - [Widget installation](docs/widget-installation.md): snippets, platform limits, private links and troubleshooting.
 - [Planning skill](../funtoolio-playbook/skills/funtoolio-plan-small-product/SKILL.md): source workflow and linked portfolio defaults.
 
-The verified first slice is: owner signs in locally and creates one unit → guest requests dates → owner confirms → those dates become unavailable, including under concurrent confirmation. **78 tests pass**, including real PostgreSQL inventory races, migration preservation, retention, scoped guest actions and mobile cookie-free cross-origin embed flows.
+The verified first slice is: owner signs in locally and creates one unit → guest requests dates → owner confirms → those dates become unavailable, including under concurrent confirmation. **79 tests pass**, including real PostgreSQL inventory races, migration preservation, retention, scoped guest actions and mobile cookie-free cross-origin embed flows.
 
 Preview: https://localhost:7259/. Common sign-in is available; explicitly enabled loopback development fixtures are at https://localhost:7259/SignIn?failed=true. They do not verify Google identity.
 

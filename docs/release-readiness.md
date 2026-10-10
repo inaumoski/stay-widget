@@ -4,15 +4,16 @@ M1–M4 feature work is implemented. M5 local preparation is verified; **StayWid
 
 ## Verified locally
 
-- Release suite: **78 passed, 0 failed, 0 skipped**, no build warnings. PostgreSQL integration tests and Chromium owner/guest/mobile/cross-origin flows run in isolated disposable databases. No pending EF model changes; all six migrations applied to the separately backed-up preview.
+- Release suite: **79 passed, 0 failed, 0 skipped**, no build warnings. PostgreSQL integration tests and Chromium owner/guest/mobile/cross-origin flows run in isolated disposable databases. No pending EF model changes; all six migrations applied to the separately backed-up preview.
 - Request-only inventory: property-row locks, active GiST overlap backstop, unit/date/capacity/season/turnover rules, idempotency, concurrent confirmation and withdrawal, manual inventory/edit/cancellation, retention and export.
+- Two-click guest range selection: alternating check-in/check-out, invalid-date recovery, selected-night highlighting with In/Out markers, cross-month persistence, manual field synchronization and keyboard/mobile checks.
 - Optional guest availability calendar: default-on owner setting, per-unit nightly availability, month navigation, failure/retry, private-data exclusion and mobile embed resizing. Calendar-year and November–December presets fill unit season dates; manual blocks mark exceptions.
 - Guest confirmation email: private address capture, atomic encrypted outbox, owner contact/cancellation link, default-disabled Brevo API transport and Development sink. Verified retry budgets, Unknown crash recovery, competing senders, key loss, cancellation/inventory preservation and restored encrypted queue. No real inbox delivery was tested.
 - Embed: direct iframe/loader/hosted fallback, validated origin/source/instance/payloads, repeated loader/multiple instances, mobile and JavaScript-disabled submission, denied unapproved ancestors, cookie-independent guest flow and private scoped actions.
 - M4: Free/Pro quotas and over-limit preservation, server-side branding, fixed promotion/continued free access, simple private feedback/Custom, aggregate choice/privacy/retry boundaries, crawlable public pages/private exclusions and nonpersistent demo.
 - Production-mode local fixture: canonical Host checks, explicit loopback proxy trust, no forwarded Host trust, private readiness, no Development login and authenticated owner boundaries. Synthetic issuer is deliberately unused; this is not Google callback evidence.
 - Synthetic PostgreSQL dump/restore to a different disposable database with copied private Data Protection keys recovered encrypted receipts, private accepted status, active inventory, overlap protection and migration history. Private rehearsal evidence is ignored under `.local/restore-rehearsal`.
-- Framework-dependent portable publish: 47 files / 9,584,457 bytes, required static assets present, no appsettings.Local.json and DevelopmentLogin disabled. Artifact is local/ignored. Selected Linux runtime execution has not been tested.
+- Framework-dependent portable publish: 47 files / 9,589,943 bytes, required static assets present, no appsettings.Local.json and DevelopmentLogin disabled. Artifact is local/ignored. Selected Linux runtime execution has not been tested.
 - Screenshots: 390px public pricing and 320px enlarged-text reflow inspected, plus prior owner/widget captures. A small Windows HTTPS read sample observed 119.9 MiB application working set and 56.8ms average across 20 sequential pricing reads (50.2ms p95). Not a capacity test or full accessibility audit.
 
 ## External gates still open
