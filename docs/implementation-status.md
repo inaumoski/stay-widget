@@ -113,3 +113,9 @@ The owner requested clear separation of Funtoolio's software role from the accom
 Visible notices link to this clause on Limitations and beside real guest form policies, independently of removable widget branding. Public navigation now labels the existing Terms page "Terms of use (draft)". No new contractual acceptance mechanism or property-policy consent was introduced. Reference: [playbook service terms guidance](../../funtoolio-playbook/references/service-terms-support-and-feedback.md), with [EU unfair-terms guidance](https://europa.eu/youreurope/citizens/consumers/unfair-treatment/unfair-contract-terms/) as a review aid, not a jurisdiction determination.
 
 Release build passed with zero warnings/errors; rendered Terms, Limitations and Pricing checks passed. Copy-only change: no additional tests; the last full feature suite remains 79 passing tests. Portable artifact: 47 files / 9,605,975 bytes, no private settings, email Disabled. No migration, production sending or deployment.
+
+## Widget Terms link
+
+Added an always-visible footer link to the reservation-agreements Terms section in both the actual widget and synthetic embedded demo, including receipt states and Pro widgets with branding removed. A shared partial builds the absolute URL from the configured canonical origin (https://localhost:7259/Terms#reservation-agreements in the local preview), opens a new tab and uses noopener. Production uses its configured origin rather than a hardcoded localhost destination. Existing real-form role notice remains.
+
+Release build and rendered demo link check passed; no additional tests for this link change. Last full feature suite remains 79 passing tests. Portable artifact: 47 files / 9,611,387 bytes, no private settings, sending Disabled. No migration or deployment.
