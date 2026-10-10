@@ -4,21 +4,31 @@ using StayWidget.Persistence;
 namespace StayWidget.Web;
 
 public sealed record PublicUnit(Guid Id, string Name, int Capacity, int MinNights, int MaxNights);
-public sealed record PublicWidget(Guid Id, string Name, string Contact, string Policies, string Currency, string AccentColor, List<PublicUnit> Units);
+public sealed record PublicWidget(Guid Id, string Name, string Contact, string Policies, string Currency, string AccentColor, List<PublicUnit> Units, bool ShowAvailabilityCalendar);
 public sealed record AvailabilityQuery(DateOnly Arrival, DateOnly Departure, int Guests);
 
 public static class PublicWidgetEndpoints
 {
     public static void MapPublicWidget(this WebApplication app)
     {
+        app.MapGet("/api/widget/{id:guid}/calendar",async(Guid id,Guid unitId,DateOnly month,int guests,BookingService service)=>
+        {
+            try{var calendar=await service.Calendar(id,unitId,month,guests);return calendar==null?Results.NotFound():Results.Ok(calendar);}
+            catch(RuleViolation e){return Results.BadRequest(new{message=e.Message});}
+        }).RequireRateLimiting("guest");
+        app.MapGet("/api/demo/calendar",(DateOnly month,int guests,TimeProvider clock)=>
+        {
+            try{var today=DateOnly.FromDateTime(clock.GetUtcNow().UtcDateTime);return Results.Ok(AvailabilityCalendar.Build(AvailabilityCalendar.DemoUnit(today),today,month,guests,[AvailabilityCalendar.DemoBlock(today)]));}
+            catch(RuleViolation e){return Results.BadRequest(new{message=e.Message});}
+        }).RequireRateLimiting("guest");
         app.MapGet("/api/widget/{id:guid}/configuration", async (Guid id, StayDb db) =>
         {
             var p = await db.Properties.AsNoTracking().Where(x => x.Id == id && x.Published && !x.Suspended)
-                .Select(x => new { x.Id, x.Name, x.Contact, x.Policies, x.Currency, x.AccentColor }).SingleOrDefaultAsync();
+                .Select(x => new { x.Id, x.Name, x.Contact, x.Policies, x.Currency, x.AccentColor, x.ShowAvailabilityCalendar }).SingleOrDefaultAsync();
             if (p == null) return Results.NotFound();
             var units = await db.Units.AsNoTracking().Where(x => x.PropertyId == id && x.Enabled).OrderBy(x => x.Name)
                 .Select(x => new PublicUnit(x.Id, x.Name, x.Capacity, x.MinNights, x.MaxNights)).ToListAsync();
-            return Results.Ok(new PublicWidget(p.Id, p.Name, p.Contact, p.Policies, p.Currency, p.AccentColor, units));
+            return Results.Ok(new PublicWidget(p.Id, p.Name, p.Contact, p.Policies, p.Currency, p.AccentColor, units, p.ShowAvailabilityCalendar));
         }).RequireRateLimiting("guest");
         app.MapPost("/api/widget/{id:guid}/availability", async (Guid id, AvailabilityQuery input, StayDb db, BookingService service, TimeProvider clock) =>
         {

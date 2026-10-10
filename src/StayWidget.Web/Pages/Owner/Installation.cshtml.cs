@@ -13,6 +13,7 @@ public sealed class InstallationModel(StayDb db, BookingService service, SiteOri
     [BindProperty] public string? Origins { get; set; }
     [BindProperty] public string Accent { get; set; } = "#12616A";
     [BindProperty] public bool Attested { get; set; }
+    [BindProperty] public bool ShowAvailabilityCalendar { get; set; } = true;
     public string Hosted => site.Value + "/request/" + Property.Id;
     public string Widget => site.Value + "/w/" + Property.Id;
     public string Loader => site.Value + "/embed/v1/loader.js";
@@ -27,14 +28,14 @@ public sealed class InstallationModel(StayDb db, BookingService service, SiteOri
     public async Task<IActionResult> OnGet()
     {
         if (!await Load()) return RedirectToPage("Index");
-        Revision = Property.Revision; Origins = string.Join('\n', Property.EmbedOrigins); Accent = Property.AccentColor; return Page();
+        Revision = Property.Revision; Origins = string.Join('\n', Property.EmbedOrigins); Accent = Property.AccentColor; ShowAvailabilityCalendar = Property.ShowAvailabilityCalendar; return Page();
     }
     public async Task<IActionResult> OnPost()
     {
         try
         {
             if (!ModelState.IsValid) throw new RuleViolation("Check the origins, accent color and acknowledgement.");
-            await service.SaveEmbedSettings(Owner, Revision, Origins ?? "", Accent, Attested, environment.IsDevelopment());
+            await service.SaveEmbedSettings(Owner, Revision, Origins ?? "", Accent, Attested, environment.IsDevelopment(), ShowAvailabilityCalendar);
             return RedirectToPage();
         }
         catch (RuleViolation e) { Response.StatusCode = 409; ModelState.AddModelError("", e.Message); if (!await Load()) return NotFound(); return Page(); }

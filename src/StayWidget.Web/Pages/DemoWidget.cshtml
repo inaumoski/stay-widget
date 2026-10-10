@@ -6,6 +6,7 @@
 <div asp-validation-summary="All" role="alert" class="error"></div>
 @if(Model.Stage=="Search"){
 <form method="post" asp-antiforgery="false" action="/demo-widget?handler=Request&amp;InstanceId=@Model.InstanceId" class="card">
+<partial name="Shared/_AvailabilityCalendar" model="@(new StayWidget.Web.CalendarView("/api/demo/calendar","",1,Model.CalendarMonth))"/>
 <label asp-for="Arrival">Check-in</label><input asp-for="Arrival" type="date" required/>
 <label asp-for="Departure">Check-out</label><input asp-for="Departure" type="date" required/>
 <label asp-for="Guests">Guests</label><input asp-for="Guests" type="number" min="1" max="2" required/>
@@ -16,4 +17,4 @@
 <section class="card" role="status"><h2>Confirmed — demonstration only</h2><p>In the real product, confirmation rechecks inventory atomically and makes these nights unavailable. Outside bookings must still be entered manually.</p></section>
 }
 <a href="/demo-widget?InstanceId=@Model.InstanceId">Reset widget demo</a>
-</main><footer>Booking requests by <a href="/go/product" target="_blank" rel="sponsored noopener">StayWidget</a> · <a href="/go/portfolio" target="_blank" rel="sponsored noopener">Funtoolio</a></footer><div id="embed-context" data-instance="@Model.InstanceId" data-origins="@Model.Origins" hidden></div><script src="/embed/v1/child.js" defer></script></body></html>
+</main><footer>Booking requests by <a href="/go/product" target="_blank" rel="sponsored noopener">StayWidget</a> · <a href="/go/portfolio" target="_blank" rel="sponsored noopener">Funtoolio</a></footer><div id="embed-context" data-instance="@Model.InstanceId" data-origins="@Model.Origins" hidden></div><script src="/availability-calendar.js" defer></script><script src="/embed/v1/child.js" defer></script></body></html>

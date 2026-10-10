@@ -9,6 +9,7 @@
 <label asp-for="Origins">Approved website origins (one per line, at most five)</label><textarea asp-for="Origins" placeholder="https://www.example.com" maxlength="2000"></textarea>
 <p>Include the exact scheme, hostname and port. www and non-www are different. No paths or wildcards. HTTP localhost is a Development-only test exception.</p>
 <label asp-for="Accent">Widget accent color</label><input asp-for="Accent" type="color" required/><p>Choose a dark accent; the server checks white button-text contrast. Language: English. Agreements: EUR. A full theme editor is outside this release.</p>
+<label class="check"><input asp-for="ShowAvailabilityCalendar"/> Show availability calendar in the widget</label><p>Selected by default. Guests see available/unavailable nights for their chosen unit, without private booking details. Set open dates in <a href="/Owner/Units">Units and seasons</a> and exceptions in <a href="/Owner/Block">Unavailable dates</a>. Switching the calendar off does not change inventory or date search.</p>
 <label class="check"><input asp-for="Attested"/> I am authorized to install this widget on every listed website. I understand these are owner-attested origins, not verified domain ownership.</label>
 <button>Save installation settings</button></form>
 <h2>Preview</h2>

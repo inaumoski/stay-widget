@@ -280,6 +280,9 @@ namespace StayWidget.Persistence.Migrations
                         .IsConcurrencyToken()
                         .HasColumnType("integer");
 
+                    b.Property<bool>("ShowAvailabilityCalendar")
+                        .HasColumnType("boolean");
+
                     b.Property<bool>("Suspended")
                         .HasColumnType("boolean");
 

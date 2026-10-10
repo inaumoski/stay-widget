@@ -13,6 +13,7 @@ public sealed class DemoWidgetModel(SiteOrigin site, TimeProvider clock) : PageM
     [BindProperty] public int Guests { get; set; } = 2;
     public string Stage { get; private set; } = "Search";
     public string Origins => System.Text.Json.JsonSerializer.Serialize(new[]{site.Value});
+    public string CalendarMonth => AvailabilityCalendar.Month(DateOnly.FromDateTime(clock.GetUtcNow().UtcDateTime)).ToString("yyyy-MM-dd");
     public IActionResult OnGet()
     {
         if(!ValidInstance()) return BadRequest(); Arrival=DateOnly.FromDateTime(clock.GetUtcNow().UtcDateTime).AddDays(7); Departure=Arrival.AddDays(2); return Page();
@@ -26,6 +27,8 @@ public sealed class DemoWidgetModel(SiteOrigin site, TimeProvider clock) : PageM
             if(!ModelState.IsValid) throw new RuleViolation("Check the dates and guest count.");
             var today=DateOnly.FromDateTime(clock.GetUtcNow().UtcDateTime);
             StayRules.Validate(Arrival,Departure,Guests,2,today,today,today.AddDays(394));
+            var unit=AvailabilityCalendar.DemoUnit(today);var block=AvailabilityCalendar.DemoBlock(today);
+            if(Arrival<unit.OpenFrom || Departure>unit.OpenTo || Arrival<block.End && block.Start<Departure) throw new RuleViolation("These sample nights are unavailable. Choose other dates in the calendar.");
             Stage=stage;
         }
         catch(RuleViolation e){Response.StatusCode=400;ModelState.AddModelError("",e.Message);}

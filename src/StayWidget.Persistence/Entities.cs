@@ -16,6 +16,7 @@ public sealed class Property
     public bool Suspended { get; set; }
     public string Plan { get; set; } = "Pro";
     public bool HideBranding { get; set; }
+    public bool ShowAvailabilityCalendar { get; set; } = true;
     public DateTimeOffset? InstallationAcknowledgedAt { get; set; }
 }
 public sealed class Unit

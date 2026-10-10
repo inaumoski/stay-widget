@@ -7,7 +7,8 @@ M3 local-preview guide, checked 10 October 2026. This preview is not ready for l
 1. Sign in, configure your property/public contact and policies, and add individually named units. Open requests deliberately. Record outside bookings and unavailable dates manually: there is no external calendar sync.
 2. Open **Install widget** from the owner dashboard. Enter up to five exact website origins, such as `https://www.example.com`, and acknowledge your installation authority. Include scheme, hostname and nondefault port; www/non-www are distinct. Paths, credentials, queries and wildcards are rejected. Production requires HTTPS. This is owner attestation, not verified domain ownership.
 3. Choose a dark accent. White button text must meet 4.5:1 contrast. The current language is English and owner agreement records use EUR; no automated accommodation quote is provided.
-4. Copy the generated loader or iframe snippet and keep its visible hosted fallback. Test a published page on mobile, create a synthetic request, save its private status link and complete the owner decision flow. Clear test bookings afterward.
+4. Leave **Show availability calendar in the widget** selected (the default), or clear it to use date fields/search only. Save installation settings.
+5. Copy the generated loader or iframe snippet and keep its visible hosted fallback. Test a published page on mobile, create a synthetic request, save its private status link and complete the owner decision flow. Clear test bookings afterward.
 
 The installation screen supplies real URLs using the trusted canonical `StayWidget:PublicOrigin` configuration and your public property UUID. The examples below use placeholders: replace `APP_ORIGIN` with that configured HTTPS origin (without a trailing slash) and `PROPERTY_UUID` with the installation screen's UUID. Do not paste private guest links or owner URLs into website code.
 
@@ -48,6 +49,16 @@ A direct iframe uses a fixed outer height with internal scrolling. Adjust its co
 | Other builders | Generic snippet or hosted link | No compatibility promise. Test published output, not just editor preview. |
 
 Provider guidance checked 10 October 2026: [WordPress Custom HTML](https://wordpress.com/support/wordpress-editor/blocks/custom-html-block/) and [Wix embed mechanisms](https://support.wix.com/en/article/wix-editor-embedding-a-site-or-a-widget). These references do not establish compatibility with every account or plan. No native plugin, marketplace app or duplicate inventory engine exists in v1.
+
+## Available nights and owner date control
+
+In **Units and seasons**, set the first bookable night and exclusive season end for each unit. **Use calendar year** fills January 1 through January 1 of the next year. **Use November–December** fills November 1 through January 1 of the next year, including December 31. Choose the year, review the dates and save; presets do not save automatically. There is one open window per unit. Guests can request arrivals from tomorrow through the next 365 days in the property timezone.
+
+Use **Add unavailable dates** to block a night or range inside that window. For November 5 only, block November 5 → November 6. Remove or edit the block to reopen those nights. Confirmed reservations and turnover gaps remain unavailable; changing seasons or removing a block does not cancel a booking.
+
+The guest calendar shows **A = Available night** and **× = Unavailable night** for the selected unit and guest count. Choose a green night to fill check-in, then review check-out and check the complete stay. Minimum/maximum stay and full inventory checks still apply. Check-out is excluded from occupied nights, so an unavailable night may still be a valid departure date. Pending requests do not hold nights; outside bookings are unknown until recorded manually. The calendar exposes no guest details, block reasons or booking sources.
+
+The calendar appears in the widget and hosted request page when enabled. Hiding it does not change inventory or disable availability search. If loading fails, retry or use the date fields; without JavaScript, use date fields and submit/search. The embedded public demo includes a synthetic calendar with a sample blocked range and stores nothing.
 
 ## Requests and private links
 

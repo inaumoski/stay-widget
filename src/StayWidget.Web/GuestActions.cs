@@ -72,14 +72,14 @@ public sealed partial class BookingService
         Record(p.Id, owner, id, "Cancellation request reviewed; reservation kept"); await Save(); await tx.CommitAsync();
     }
 
-    public async Task SaveEmbedSettings(Guid owner, int revision, string origins, string accent, bool attested, bool development)
+    public async Task SaveEmbedSettings(Guid owner, int revision, string origins, string accent, bool attested, bool development, bool showAvailabilityCalendar = true)
     {
         var list = origins.Split('\n', StringSplitOptions.RemoveEmptyEntries | StringSplitOptions.TrimEntries).Select(x => EmbedPolicy.Origin(x, development)).Distinct().ToArray();
         if (list.Length > 5 || list.Length > 0 && !attested) throw new RuleViolation("Approve at most five exact origins and attest that you are authorized to install on them.");
         accent = EmbedPolicy.Accent(accent);
         await using var tx = await db.Database.BeginTransactionAsync(); var p = await Lock(owner);
         if (p.Revision != revision) throw new RuleViolation("Property settings changed. Refresh before saving installation settings.");
-        p.EmbedOrigins = list; p.AccentColor = accent; p.EmbedAttestedAt = list.Length > 0 ? clock.GetUtcNow() : null; p.Revision++;
+        p.EmbedOrigins = list; p.AccentColor = accent; p.EmbedAttestedAt = list.Length > 0 ? clock.GetUtcNow() : null; p.ShowAvailabilityCalendar = showAvailabilityCalendar; p.Revision++;
         Record(p.Id, owner, p.Id, "Embed origins/theme saved", "Owner-attested origins; no domain-verification fetch performed.");
         await Save(); await tx.CommitAsync();
     }

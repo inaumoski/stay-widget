@@ -9,6 +9,7 @@ namespace StayWidget.Web.Pages.Owner;
 public sealed class UnitsModel(StayDb db, BookingService service, TimeProvider clock) : PageModel
 {
     public List<Unit> Units { get; private set; } = [];
+    public int CurrentYear { get; private set; }
     public List<Reservation> ExistingBookings { get; private set; } = [];
     [BindProperty] public Guid Id { get; set; }
     [BindProperty] public int? Revision { get; set; }
@@ -28,6 +29,7 @@ public sealed class UnitsModel(StayDb db, BookingService service, TimeProvider c
         {
             Units = await db.Units.AsNoTracking().Where(x => x.PropertyId == p.Id).OrderBy(x => x.Name).ToListAsync();
             var today = StayRules.Today(clock.GetUtcNow(), p.Zone);
+            CurrentYear = today.Year;
             ExistingBookings = await db.Reservations.AsNoTracking().Where(x => x.PropertyId == p.Id && x.State == "Confirmed" && x.Departure > today).OrderBy(x => x.Arrival).ToListAsync();
         }
         return p;

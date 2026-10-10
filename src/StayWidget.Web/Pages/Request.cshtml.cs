@@ -13,6 +13,7 @@ public sealed class RequestModel(StayDb db, BookingService service, TimeProvider
     private readonly IDataProtector protector=protection.CreateProtector("StayWidget.GuestForm.v3");
     public bool IsWidget => Request.Path.StartsWithSegments("/w");
     public bool ShowBranding => ProductPlans.ShowBranding(Property);
+    public string CalendarMonth => AvailabilityCalendar.Month(StayRules.Today(clock.GetUtcNow(),Property.Zone)).ToString("yyyy-MM-dd");
     [BindProperty(SupportsGet = true)] public string? InstanceId {get;set;}
     [BindProperty] public string? Website {get;set;}
     public Receipt? Receipt {get;private set;}
