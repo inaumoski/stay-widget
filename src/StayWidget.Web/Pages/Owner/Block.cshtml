@@ -1,0 +1,12 @@
+@page
+@model StayWidget.Web.Pages.Owner.BlockModel
+@{ViewData["Title"]="Unavailable dates";}
+<a href="/Owner/Inventory">← Calendar and bookings</a><h1>Unavailable dates</h1>
+<p>Record outside bookings, maintenance or closures. The end date is excluded. Blocks cannot overlap recorded bookings or other active blocks; merge or edit them explicitly.</p>
+<div asp-validation-summary="All" class="error" role="alert"></div>
+@if(Model.Active){<form method="post" class="card"><input asp-for="Id" type="hidden"/><input asp-for="Revision" type="hidden"/>
+<label asp-for="UnitId">Unit</label><select asp-for="UnitId">@foreach(var u in Model.Units){<option value="@u.Id">@u.Name</option>}</select>
+<div class="columns"><div><label asp-for="Start">First blocked night</label><input asp-for="Start" type="date" required/></div><div><label asp-for="End">End date (excluded)</label><input asp-for="End" type="date" required/></div></div>
+<label asp-for="Reason">Private reason</label><input asp-for="Reason" maxlength="200" required/><button>Save unavailable dates</button></form>
+@if(Model.Revision.HasValue){<form method="post" asp-page-handler="Remove"><input asp-for="Id" type="hidden"/><input asp-for="Revision" type="hidden"/><p>Remove this block: @Model.Start → @Model.End.</p><button class="secondary">Remove block and release dates</button></form>}}
+else{<p>This block is inactive. To close dates again, create a new block.</p>}

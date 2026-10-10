@@ -1,0 +1,18 @@
+@page
+@model StayWidget.Web.Pages.Owner.UnitsModel
+@{ ViewData["Title"] = "Units and seasons"; }
+<a href="/Owner">← Dashboard</a><h1>Units and seasons</h1>
+<p>Your plan limits open units (Free 1, Pro 5); this preview stores at most five units including closed drafts. New units start closed; review and open them with a second save. Closing a unit or narrowing its season preserves existing bookings.</p>
+<ul>@foreach(var u in Model.Units){<li><a href="/Owner/Units?id=@u.Id">@u.Name</a> · @u.Capacity guests · @(u.Enabled?"Open":"Closed") · @u.OpenFrom → @u.OpenTo (end excluded)</li>}</ul>
+<a href="/Owner/Units">Add another unit</a><h2>@(Model.Revision.HasValue?"Edit unit":"New unit")</h2>
+@if(Model.Revision.HasValue && Model.ExistingBookings.Any(x=>x.UnitId==Model.Id)){
+<details><summary>Existing bookings preserved by these settings</summary><ul>@foreach(var r in Model.ExistingBookings.Where(x=>x.UnitId==Model.Id)){<li><a href="/Owner/Reservation?id=@r.Id">@r.Arrival → @r.Departure · @r.Guests guests</a> — @(r.Arrival<Model.OpenFrom || r.Departure>Model.OpenTo || r.Departure.DayNumber-r.Arrival.DayNumber<Model.MinNights || r.Departure.DayNumber-r.Arrival.DayNumber>Model.MaxNights?"outside current season/stay rules":"within current rules")</li>}</ul></details>}
+<div asp-validation-summary="All" class="error" role="alert"></div>
+<form method="post" class="card"><input asp-for="Id" type="hidden"/><input asp-for="Revision" type="hidden"/>
+<label asp-for="UnitName">Unit name</label><input asp-for="UnitName" maxlength="100" required/>
+<label asp-for="Capacity">Maximum guests</label><input asp-for="Capacity" type="number" min="1" max="20" required/>
+<div class="columns"><div><label asp-for="OpenFrom">First bookable night</label><input asp-for="OpenFrom" type="date" required/></div><div><label asp-for="OpenTo">Season end (check-out allowed)</label><input asp-for="OpenTo" type="date" required/></div></div>
+<div class="columns"><div><label asp-for="MinNights">Minimum nights</label><input asp-for="MinNights" type="number" min="1" max="28" required/></div><div><label asp-for="MaxNights">Maximum nights</label><input asp-for="MaxNights" type="number" min="1" max="28" required/></div><div><label asp-for="Turnover">Turnover gap</label><select asp-for="Turnover"><option value="0">Same-day arrival allowed</option><option value="1">One extra blocked night</option></select></div></div>
+<p>June 10 → June 12 occupies June 10 and 11. A one-night turnover gap also blocks June 12. Buffer changes that collide with bookings or blocks are rejected.</p>
+@if(Model.Revision.HasValue){<label class="check"><input asp-for="Enabled"/> Open this unit for requests</label>}
+<button>Save unit</button></form>

@@ -22,11 +22,71 @@ namespace StayWidget.Persistence.Migrations
 
             NpgsqlModelBuilderExtensions.UseIdentityByDefaultColumns(modelBuilder);
 
+            modelBuilder.Entity("StayWidget.Persistence.ActivityRecord", b =>
+                {
+                    b.Property<Guid>("Id")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("uuid");
+
+                    b.Property<string>("Action")
+                        .IsRequired()
+                        .HasColumnType("text");
+
+                    b.Property<Guid?>("ActorId")
+                        .HasColumnType("uuid");
+
+                    b.Property<DateTimeOffset>("At")
+                        .HasColumnType("timestamp with time zone");
+
+                    b.Property<string>("Details")
+                        .IsRequired()
+                        .HasColumnType("text");
+
+                    b.Property<Guid>("EntityId")
+                        .HasColumnType("uuid");
+
+                    b.Property<Guid>("PropertyId")
+                        .HasColumnType("uuid");
+
+                    b.HasKey("Id");
+
+                    b.HasIndex("PropertyId", "At");
+
+                    b.ToTable("Activity");
+                });
+
+            modelBuilder.Entity("StayWidget.Persistence.DailyMetric", b =>
+                {
+                    b.Property<DateOnly>("Day")
+                        .HasColumnType("date");
+
+                    b.Property<string>("Event")
+                        .HasMaxLength(40)
+                        .HasColumnType("character varying(40)");
+
+                    b.Property<long>("Count")
+                        .HasColumnType("bigint");
+
+                    b.HasKey("Day", "Event");
+
+                    b.ToTable("Metrics");
+                });
+
             modelBuilder.Entity("StayWidget.Persistence.InventoryAllocation", b =>
                 {
                     b.Property<Guid>("Id")
                         .ValueGeneratedOnAdd()
                         .HasColumnType("uuid");
+
+                    b.Property<bool>("Active")
+                        .HasColumnType("boolean");
+
+                    b.Property<string>("CommandHash")
+                        .IsRequired()
+                        .HasColumnType("text");
+
+                    b.Property<DateTimeOffset>("Created")
+                        .HasColumnType("timestamp with time zone");
 
                     b.Property<DateOnly>("End")
                         .HasColumnType("date");
@@ -34,8 +94,16 @@ namespace StayWidget.Persistence.Migrations
                     b.Property<Guid>("PropertyId")
                         .HasColumnType("uuid");
 
-                    b.Property<Guid>("ReservationId")
+                    b.Property<string>("Reason")
+                        .IsRequired()
+                        .HasColumnType("text");
+
+                    b.Property<Guid?>("ReservationId")
                         .HasColumnType("uuid");
+
+                    b.Property<int>("Revision")
+                        .IsConcurrencyToken()
+                        .HasColumnType("integer");
 
                     b.Property<DateOnly>("Start")
                         .HasColumnType("date");
@@ -80,11 +148,91 @@ namespace StayWidget.Persistence.Migrations
                     b.ToTable("Users");
                 });
 
+            modelBuilder.Entity("StayWidget.Persistence.ProductFeedback", b =>
+                {
+                    b.Property<Guid>("Id")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("uuid");
+
+                    b.Property<string>("Body")
+                        .IsRequired()
+                        .HasMaxLength(4000)
+                        .HasColumnType("character varying(4000)");
+
+                    b.Property<string>("CloseReason")
+                        .HasColumnType("text");
+
+                    b.Property<DateTimeOffset?>("Closed")
+                        .HasColumnType("timestamp with time zone");
+
+                    b.Property<string>("Comment")
+                        .IsRequired()
+                        .HasMaxLength(4000)
+                        .HasColumnType("character varying(4000)");
+
+                    b.Property<string>("Contact")
+                        .IsRequired()
+                        .HasMaxLength(200)
+                        .HasColumnType("character varying(200)");
+
+                    b.Property<DateTimeOffset>("Created")
+                        .HasColumnType("timestamp with time zone");
+
+                    b.Property<string>("Kind")
+                        .IsRequired()
+                        .HasColumnType("text");
+
+                    b.Property<string>("NoticeVersion")
+                        .IsRequired()
+                        .HasColumnType("text");
+
+                    b.Property<string>("Response")
+                        .HasColumnType("text");
+
+                    b.Property<DateTimeOffset?>("Reviewed")
+                        .HasColumnType("timestamp with time zone");
+
+                    b.Property<int>("Revision")
+                        .IsConcurrencyToken()
+                        .HasColumnType("integer");
+
+                    b.Property<string>("Status")
+                        .IsRequired()
+                        .HasColumnType("text");
+
+                    b.Property<Guid>("SubmissionKey")
+                        .HasColumnType("uuid");
+
+                    b.Property<Guid>("SubmitterUserId")
+                        .HasColumnType("uuid");
+
+                    b.Property<DateTimeOffset>("Updated")
+                        .HasColumnType("timestamp with time zone");
+
+                    b.HasKey("Id");
+
+                    b.HasIndex("Status", "Closed");
+
+                    b.HasIndex("SubmitterUserId", "Created");
+
+                    b.HasIndex("SubmitterUserId", "SubmissionKey")
+                        .IsUnique();
+
+                    b.ToTable("Feedback", t =>
+                        {
+                            t.HasCheckConstraint("FeedbackState", "\"Status\" IN ('New','Reviewed','Planned','InProgress','Closed') AND ((\"Status\"='Closed' AND \"Closed\" IS NOT NULL AND \"CloseReason\" IS NOT NULL AND \"CloseReason\" IN ('Delivered','Duplicate','NotPlanned','CannotReproduce','Spam')) OR (\"Status\"<>'Closed' AND \"Closed\" IS NULL AND \"CloseReason\" IS NULL)) AND ((\"Status\"='New' AND \"Reviewed\" IS NULL) OR (\"Status\"<>'New' AND \"Reviewed\" IS NOT NULL)) AND \"Kind\" IN ('Feedback','Custom')");
+                        });
+                });
+
             modelBuilder.Entity("StayWidget.Persistence.Property", b =>
                 {
                     b.Property<Guid>("Id")
                         .ValueGeneratedOnAdd()
                         .HasColumnType("uuid");
+
+                    b.Property<string>("AccentColor")
+                        .IsRequired()
+                        .HasColumnType("text");
 
                     b.Property<string>("Contact")
                         .IsRequired()
@@ -94,6 +242,22 @@ namespace StayWidget.Persistence.Migrations
                         .IsRequired()
                         .HasColumnType("text");
 
+                    b.Property<DateTimeOffset?>("EmbedAttestedAt")
+                        .HasColumnType("timestamp with time zone");
+
+                    b.PrimitiveCollection<string[]>("EmbedOrigins")
+                        .IsRequired()
+                        .HasColumnType("text[]");
+
+                    b.Property<bool>("HideBranding")
+                        .HasColumnType("boolean");
+
+                    b.Property<DateTimeOffset?>("InstallationAcknowledgedAt")
+                        .HasColumnType("timestamp with time zone");
+
+                    b.Property<DateTimeOffset>("MaintenanceAt")
+                        .HasColumnType("timestamp with time zone");
+
                     b.Property<string>("Name")
                         .IsRequired()
                         .HasColumnType("text");
@@ -101,9 +265,23 @@ namespace StayWidget.Persistence.Migrations
                     b.Property<Guid>("OwnerId")
                         .HasColumnType("uuid");
 
+                    b.Property<string>("Plan")
+                        .IsRequired()
+                        .HasColumnType("text");
+
                     b.Property<string>("Policies")
                         .IsRequired()
                         .HasColumnType("text");
+
+                    b.Property<bool>("Published")
+                        .HasColumnType("boolean");
+
+                    b.Property<int>("Revision")
+                        .IsConcurrencyToken()
+                        .HasColumnType("integer");
+
+                    b.Property<bool>("Suspended")
+                        .HasColumnType("boolean");
 
                     b.Property<string>("TermsVersion")
                         .IsRequired()
@@ -118,7 +296,10 @@ namespace StayWidget.Persistence.Migrations
                     b.HasIndex("OwnerId")
                         .IsUnique();
 
-                    b.ToTable("Properties");
+                    b.ToTable("Properties", t =>
+                        {
+                            t.HasCheckConstraint("PlanValid", "\"Plan\" IN ('Free','Pro')");
+                        });
                 });
 
             modelBuilder.Entity("StayWidget.Persistence.Reservation", b =>
@@ -134,6 +315,16 @@ namespace StayWidget.Persistence.Migrations
                     b.Property<DateOnly>("Arrival")
                         .HasColumnType("date");
 
+                    b.Property<bool>("CancellationRequested")
+                        .HasColumnType("boolean");
+
+                    b.Property<DateTimeOffset?>("Cancelled")
+                        .HasColumnType("timestamp with time zone");
+
+                    b.Property<string>("CommandHash")
+                        .IsRequired()
+                        .HasColumnType("text");
+
                     b.Property<DateTimeOffset>("Confirmed")
                         .HasColumnType("timestamp with time zone");
 
@@ -144,11 +335,33 @@ namespace StayWidget.Persistence.Migrations
                     b.Property<DateOnly>("Departure")
                         .HasColumnType("date");
 
+                    b.Property<int>("Guests")
+                        .HasColumnType("integer");
+
+                    b.Property<string>("Name")
+                        .IsRequired()
+                        .HasColumnType("text");
+
+                    b.Property<string>("Phone")
+                        .IsRequired()
+                        .HasColumnType("text");
+
                     b.Property<Guid>("PropertyId")
                         .HasColumnType("uuid");
 
-                    b.Property<Guid>("RequestId")
+                    b.Property<bool>("Redacted")
+                        .HasColumnType("boolean");
+
+                    b.Property<Guid?>("RequestId")
                         .HasColumnType("uuid");
+
+                    b.Property<int>("Revision")
+                        .IsConcurrencyToken()
+                        .HasColumnType("integer");
+
+                    b.Property<string>("State")
+                        .IsRequired()
+                        .HasColumnType("text");
 
                     b.Property<string>("TermsVersion")
                         .IsRequired()
@@ -174,8 +387,17 @@ namespace StayWidget.Persistence.Migrations
                         .ValueGeneratedOnAdd()
                         .HasColumnType("uuid");
 
+                    b.Property<string>("ActionHash")
+                        .HasColumnType("text");
+
                     b.Property<DateOnly>("Arrival")
                         .HasColumnType("date");
+
+                    b.Property<bool>("CapabilitiesRevoked")
+                        .HasColumnType("boolean");
+
+                    b.Property<DateTimeOffset?>("Closed")
+                        .HasColumnType("timestamp with time zone");
 
                     b.Property<DateTimeOffset>("Created")
                         .HasColumnType("timestamp with time zone");
@@ -220,6 +442,9 @@ namespace StayWidget.Persistence.Migrations
                         .IsRequired()
                         .HasColumnType("text");
 
+                    b.Property<bool>("Redacted")
+                        .HasColumnType("boolean");
+
                     b.Property<int>("Revision")
                         .IsConcurrencyToken()
                         .HasColumnType("integer");
@@ -241,11 +466,18 @@ namespace StayWidget.Persistence.Migrations
 
                     b.HasKey("Id");
 
+                    b.HasIndex("ActionHash")
+                        .IsUnique();
+
                     b.HasIndex("TokenHash")
                         .IsUnique();
 
+                    b.HasIndex("PropertyId", "Created");
+
                     b.HasIndex("PropertyId", "KeyHash")
                         .IsUnique();
+
+                    b.HasIndex("State", "Expires");
 
                     b.HasIndex("PropertyId", "State", "Created");
 
@@ -264,6 +496,12 @@ namespace StayWidget.Persistence.Migrations
                     b.Property<bool>("Enabled")
                         .HasColumnType("boolean");
 
+                    b.Property<int>("MaxNights")
+                        .HasColumnType("integer");
+
+                    b.Property<int>("MinNights")
+                        .HasColumnType("integer");
+
                     b.Property<string>("Name")
                         .IsRequired()
                         .HasColumnType("text");
@@ -277,6 +515,10 @@ namespace StayWidget.Persistence.Migrations
                     b.Property<Guid>("PropertyId")
                         .HasColumnType("uuid");
 
+                    b.Property<int>("Revision")
+                        .IsConcurrencyToken()
+                        .HasColumnType("integer");
+
                     b.Property<int>("Turnover")
                         .HasColumnType("integer");
 
@@ -288,13 +530,37 @@ namespace StayWidget.Persistence.Migrations
                     b.ToTable("Units");
                 });
 
+            modelBuilder.Entity("StayWidget.Persistence.ActivityRecord", b =>
+                {
+                    b.HasOne("StayWidget.Persistence.Property", null)
+                        .WithMany()
+                        .HasForeignKey("PropertyId")
+                        .OnDelete(DeleteBehavior.Restrict)
+                        .IsRequired();
+                });
+
             modelBuilder.Entity("StayWidget.Persistence.InventoryAllocation", b =>
                 {
+                    b.HasOne("StayWidget.Persistence.Unit", null)
+                        .WithMany()
+                        .HasForeignKey("PropertyId", "UnitId")
+                        .HasPrincipalKey("PropertyId", "Id")
+                        .OnDelete(DeleteBehavior.Restrict)
+                        .IsRequired();
+
                     b.HasOne("StayWidget.Persistence.Reservation", null)
                         .WithOne()
                         .HasForeignKey("StayWidget.Persistence.InventoryAllocation", "PropertyId", "UnitId", "ReservationId")
                         .HasPrincipalKey("StayWidget.Persistence.Reservation", "PropertyId", "UnitId", "Id")
-                        .OnDelete(DeleteBehavior.Restrict)
+                        .OnDelete(DeleteBehavior.Restrict);
+                });
+
+            modelBuilder.Entity("StayWidget.Persistence.ProductFeedback", b =>
+                {
+                    b.HasOne("StayWidget.Persistence.LocalUser", null)
+                        .WithMany()
+                        .HasForeignKey("SubmitterUserId")
+                        .OnDelete(DeleteBehavior.Cascade)
                         .IsRequired();
                 });
 
@@ -309,12 +575,18 @@ namespace StayWidget.Persistence.Migrations
 
             modelBuilder.Entity("StayWidget.Persistence.Reservation", b =>
                 {
+                    b.HasOne("StayWidget.Persistence.Unit", null)
+                        .WithMany()
+                        .HasForeignKey("PropertyId", "UnitId")
+                        .HasPrincipalKey("PropertyId", "Id")
+                        .OnDelete(DeleteBehavior.Restrict)
+                        .IsRequired();
+
                     b.HasOne("StayWidget.Persistence.ReservationRequest", null)
                         .WithOne()
                         .HasForeignKey("StayWidget.Persistence.Reservation", "PropertyId", "UnitId", "RequestId")
                         .HasPrincipalKey("StayWidget.Persistence.ReservationRequest", "PropertyId", "UnitId", "Id")
-                        .OnDelete(DeleteBehavior.Restrict)
-                        .IsRequired();
+                        .OnDelete(DeleteBehavior.Restrict);
                 });
 
             modelBuilder.Entity("StayWidget.Persistence.ReservationRequest", b =>

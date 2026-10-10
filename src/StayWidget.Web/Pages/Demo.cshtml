@@ -1,0 +1,9 @@
+@page
+@model StayWidget.Web.Pages.DemoModel
+@{ViewData["Title"]="Try a synthetic reservation request"; ViewData["Description"]="Explore StayWidget's pending request and owner confirmation flow without an account or changes to real inventory.";}
+<h1>Try the request flow</h1><p>This is a synthetic demonstration. Nothing is saved, no real accommodation is offered, and no guest information is collected. No email or payment is sent.</p>
+<section class="card"><h2>Garden Cottage · two guests</h2><p>Sample dates: June 10 → June 12. Two occupied nights; departure excluded.</p>
+@if(Model.Stage=="Search"){<p>Available in this demonstration. Availability does not hold dates.</p><form method="post" asp-page-handler="Request"><button>Simulate reservation request</button></form>}
+else if(Model.Stage=="Pending"){<h3>Request received — Pending</h3><p>This is not a confirmed reservation. In the actual product the guest saves a private link and the owner checks the dashboard, agrees price/terms and decides.</p><form method="post" asp-page-handler="Confirm"><button>Simulate owner confirmation</button></form>}
+else{<h3>Confirmed — sample dates unavailable</h3><p>Confirmation creates occupancy after the database rechecks inventory. A conflicting confirmation is rejected. Outside bookings still have to be recorded manually.</p><a href="/Demo">Reset demonstration</a>}
+</section><a class="button secondary" href="/Owner">Set up your property</a>

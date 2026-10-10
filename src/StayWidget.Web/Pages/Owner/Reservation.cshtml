@@ -1,0 +1,23 @@
+@page
+@model StayWidget.Web.Pages.Owner.ReservationModel
+@{ViewData["Title"]=Model.Revision.HasValue?"Reservation details":"Manual booking";}
+<a href="/Owner/Inventory">← Calendar and bookings</a><h1>@ViewData["Title"]</h1><p>Status: @Model.State</p>
+<div asp-validation-summary="All" class="error" role="alert"></div>
+@if(Model.CancellationRequested){<section class="card"><h2>Guest requested cancellation</h2><p>This reservation still occupies its dates. Contact the guest and review your property terms. Use the cancellation form below to release inventory, or explicitly keep it.</p><form method="post" asp-page-handler="Keep"><input asp-for="Id" type="hidden"/><input asp-for="Revision" type="hidden"/><label class="check"><input asp-for="Reviewed" required/> I reviewed the cancellation request and will communicate the decision directly.</label><button class="secondary">Keep reservation confirmed</button></form></section>}
+@if(Model.State is "Confirmed" or "New"){
+<p>Record an outside booking or edit dates in the same unit. Existing enquiry dates and policies remain unchanged. Guest status shows current reservation dates; contact the guest yourself about changes.</p>
+<form method="post" class="card"><input asp-for="Id" type="hidden"/><input asp-for="Revision" type="hidden"/>
+<label asp-for="UnitId">Unit</label><select asp-for="UnitId">@foreach(var u in Model.Units){<option value="@u.Id">@u.Name</option>}</select>
+<div class="columns"><div><label asp-for="Arrival">Check-in</label><input asp-for="Arrival" type="date" required/></div><div><label asp-for="Departure">Check-out</label><input asp-for="Departure" type="date" required/></div><div><label asp-for="Guests">Guests</label><input asp-for="Guests" type="number" min="1" max="20" required/></div></div>
+<label asp-for="GuestName">Guest name</label><input asp-for="GuestName" maxlength="120" required/>
+<label asp-for="Phone">Guest phone</label><input asp-for="Phone" type="tel" maxlength="40" required/>
+<label asp-for="Amount">Agreed total (EUR)</label><input asp-for="Amount" type="number" min="0" max="9999999999" step="0.01" required/>
+<label class="check"><input asp-for="Agreed" required/> I agreed these dates, price and terms with the guest and checked outside bookings.</label>
+<button>@(Model.Revision.HasValue?"Save reservation changes":"Add manual booking")</button></form>
+}
+@if(Model.State=="Confirmed"){
+<section class="card"><h2>Cancel reservation</h2><p>Dates to release: @Model.Arrival → @Model.Departure. Handle any property cancellation or refund obligations separately. No email will be sent.</p>
+<form method="post" asp-page-handler="Cancel"><input asp-for="Id" type="hidden"/><input asp-for="Revision" type="hidden"/>
+<label class="check"><input asp-for="Reviewed" required/> I reviewed these dates and cancellation obligations. Release the recorded inventory.</label><button class="secondary">Record cancellation and release dates</button></form></section>
+}
+@if(Model.State=="Cancelled"){<p>This booking is retained in history. Its dates are no longer occupied. A cancellation retry cannot reactivate it.</p>}

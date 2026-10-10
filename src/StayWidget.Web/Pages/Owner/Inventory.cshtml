@@ -1,0 +1,18 @@
+@page
+@model StayWidget.Web.Pages.Owner.InventoryModel
+@{ViewData["Title"]="Calendar and bookings";}
+<a href="/Owner">← Dashboard</a><h1>Calendar and bookings</h1>
+<p>Property-local dates (@Model.Property.Zone). Check-out is excluded. “Open” means no recorded booking or block; outside bookings remain your responsibility. Pending requests do not hold nights.</p>
+<nav class="owner-links" aria-label="Inventory tools"><a href="/Owner/Reservation">Add manual booking</a><a href="/Owner/Block">Add unavailable dates</a><a href="?handler=Export">Download private booking CSV</a></nav>
+<form method="get"><label asp-for="From">Calendar start</label><input asp-for="From" type="date" required/><button class="secondary">Show dates</button></form>
+<nav aria-label="Calendar dates"><a href="?From=@Model.From.AddDays(-14).ToString("yyyy-MM-dd")">Previous 14 nights</a><a href="?From=@Model.To.ToString("yyyy-MM-dd")">Next 14 nights</a></nav>
+<div class="calendar-scroll" tabindex="0" aria-label="Fourteen-night calendar, scroll horizontally for more dates"><table><caption>Recorded inventory: @Model.From → @Model.To (end excluded)</caption><thead><tr><th scope="col">Unit</th>@for(var d=Model.From;d<Model.To;d=d.AddDays(1)){<th scope="col">@d.ToString("dd MMM")</th>}</tr></thead><tbody>
+@foreach(var u in Model.Units){<tr><th scope="row">@u.Name</th>@for(var d=Model.From;d<Model.To;d=d.AddDays(1)){var state=Model.Night(u,d);<td class="night-@state.ToLowerInvariant()">@state</td>}</tr>}
+</tbody></table></div>
+<h2>Bookings in these dates</h2>
+@if(Model.Reservations.Count==0){<p>No bookings in this date range.</p>}
+@foreach(var r in Model.Reservations){<article class="card"><h3><a href="/Owner/Reservation?id=@r.Id">@Model.Units.Single(x=>x.Id==r.UnitId).Name · @r.Arrival → @r.Departure</a></h3><p>@r.State · @r.Guests guests · @r.Name · @r.Phone</p><p>Agreed total: @r.Amount.ToString("0.00") @r.Currency</p>@if(r.CancellationRequested){<p>Guest requested cancellation. Inventory is still occupied until you record cancellation.</p>}</article>}
+<h2>Manual blocks in these dates</h2>
+@foreach(var a in Model.Allocations.Where(x=>x.ReservationId==null)){<article class="card"><h3><a href="/Owner/Block?id=@a.Id">@Model.Units.Single(x=>x.Id==a.UnitId).Name · @a.Start → @a.End</a></h3><p>@a.Reason (private)</p></article>}
+<p>CSV contains guest data: keep it private. It excludes private status tokens. It complements backups; it does not synchronize other calendars.</p>
+<h2>Recent activity</h2><ul>@foreach(var a in Model.Activity){<li>@a.At.ToString("u") · @a.Action @a.Details</li>}</ul>

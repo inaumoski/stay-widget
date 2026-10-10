@@ -1,0 +1,29 @@
+@page
+@model StayWidget.Web.Pages.Owner.InstallationModel
+@{ViewData["Title"]="Install your widget";}
+<a href="/Owner">← Dashboard</a><h1>Install your widget</h1>
+<p>Configure your property, approve your website origins, then copy and paste a snippet. Requests require your approval; there is no email or calendar sync. Guests must save a private link and you must check the dashboard daily.</p>
+<p>The generated addresses use the configured canonical application origin. This local preview is not a production booking service.</p>
+<div asp-validation-summary="All" class="error" role="alert"></div>
+<form method="post" class="card"><input asp-for="Revision" type="hidden"/>
+<label asp-for="Origins">Approved website origins (one per line, at most five)</label><textarea asp-for="Origins" placeholder="https://www.example.com" maxlength="2000"></textarea>
+<p>Include the exact scheme, hostname and port. www and non-www are different. No paths or wildcards. HTTP localhost is a Development-only test exception.</p>
+<label asp-for="Accent">Widget accent color</label><input asp-for="Accent" type="color" required/><p>Choose a dark accent; the server checks white button-text contrast. Language: English. Agreements: EUR. A full theme editor is outside this release.</p>
+<label class="check"><input asp-for="Attested"/> I am authorized to install this widget on every listed website. I understand these are owner-attested origins, not verified domain ownership.</label>
+<button>Save installation settings</button></form>
+<h2>Preview</h2>
+@if(Model.Property.Published && !Model.Property.Suspended){<div data-staywidget="@Model.Property.Id"><a href="@Model.Hosted" target="_blank" rel="noopener">Open reservation request page</a></div>}
+else{<p>New requests are paused or the property is suspended. Existing bookings remain in the owner calendar.</p>}
+<h2>Plain HTML and permitted WordPress Custom HTML blocks</h2>
+<label for="loader-snippet">Loader snippet (automatically resizes the inner iframe)</label><textarea id="loader-snippet" class="install-snippet" readonly>@Model.LoaderSnippet</textarea><button type="button" data-copy-snippet="loader-snippet">Copy loader snippet</button>
+<p>Paste into a page that allows scripts. Your site's CSP must allow @Model.Loader under script-src and @Model.Widget under frame-src. Up to ten containers per page are supported. Repeated loading does not add duplicate frames. Content above 1,600px scrolls inside the frame.</p>
+<h2>Direct iframe / website builders</h2><label for="iframe-snippet">Fixed-height iframe snippet</label><textarea id="iframe-snippet" class="install-snippet" readonly>@Model.IframeSnippet</textarea><button type="button" data-copy-snippet="iframe-snippet">Copy iframe snippet</button>
+<p>A direct iframe uses an 860px container and internal scrolling; adjust the outer height in your builder. Private status and actions open in a new tab. Keep the visible hosted fallback link.</p>
+<h2>Hosted fallback</h2><a href="@Model.Hosted" target="_blank" rel="noopener">Open reservation request page</a>
+<h2>Record installation acknowledgement</h2>
+@if(Model.Property.InstallationAcknowledgedAt!=null){<p>Instructions acknowledged @Model.Property.InstallationAcknowledgedAt.Value.ToString("u"). This does not verify a published installation.</p>}
+else{<form method="post" asp-page-handler="Activate" class="card"><input name="Revision" value="@Model.Property.Revision" type="hidden"/><label class="check"><input name="acknowledged" value="true" type="checkbox" required/> I have read the instructions and understand the required published-page checks.</label><button>Record activation acknowledgement</button></form>}
+<h2>Installation checks</h2><ol><li>Test a published page, including its mobile layout, and create a synthetic enquiry.</li><li>WordPress permissions, plan, theme or plugins may remove scripts/iframes. Native plugins and marketplace apps are outside v1.</li><li>For Wix, try supported Embed HTML or Embed a Site using @Model.Widget. Nested frames require every ancestor origin to be approved; the loader cannot resize Wix's outer container. Opaque sandbox origins are unsupported.</li><li>If a builder blocks scripts, frames or popup status links, use the hosted fallback. Installation on every builder or plan is not promised.</li></ol>
+<p>Real WordPress/Wix published-page smoke tests remain launch verification tasks. No domain-verification URL fetch or provider account is created here.</p><p id="snippet-result" role="status"></p>
+<p>Safety controls allow up to five new valid submission attempts per network per ten minutes, 100 per property per UTC day, and bounded public reads globally. Rejected attempts show retry/contact advice; saved requests and exact receipt retries are preserved. These are abuse controls, not purchased request credits.</p>
+@section Scripts{<script src="/embed/v1/loader.js" defer></script><script src="/installation.js" defer></script>}

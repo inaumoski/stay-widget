@@ -1,0 +1,14 @@
+@page
+@model StayWidget.Web.Pages.Owner.SettingsModel
+@{ ViewData["Title"] = "Property settings"; }
+<a href="/Owner">← Dashboard</a><h1>Property settings</h1>
+<p>Pausing new requests preserves all bookings and private status links. Contact and policy updates apply to new requests; existing enquiries keep their original policy snapshot.</p>
+<p>Property time zone: @Model.Zone. Changing it after setup is outside this release.</p>
+<div asp-validation-summary="All" class="error" role="alert"></div>
+<form method="post" class="card"><input asp-for="Revision" type="hidden"/>
+<label asp-for="PropertyName">Property name</label><input asp-for="PropertyName" maxlength="120" required/>
+<label asp-for="Contact">Public contact</label><input asp-for="Contact" maxlength="200" required/>
+<label asp-for="Policies">Booking and cancellation policies</label><textarea asp-for="Policies" minlength="10" maxlength="4000" required></textarea>
+<label class="check"><input asp-for="Published"/> Open for new reservation requests</label>
+<label class="check"><input asp-for="Understood"/> I will maintain outside inventory manually, check requests daily and contact guests myself. There is no automated email or calendar sync.</label>
+<button>Save property settings</button></form>

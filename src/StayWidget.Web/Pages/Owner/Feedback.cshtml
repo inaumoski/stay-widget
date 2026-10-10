@@ -1,0 +1,12 @@
+@page
+@model StayWidget.Web.Pages.Owner.FeedbackModel
+@{ViewData["Title"]=Model.Kind=="Custom"?"Custom requirements":"Send product feedback";}
+<a href="/Owner">← Dashboard</a><h1>@ViewData["Title"]</h1>
+@if(Model.Saved){<section class="card" role="status"><h2>Submission received</h2><p>Your submission was saved privately. It does not grant Custom access, promise a reply, delivery date, payment or credit.</p><a href="/Owner">Return to dashboard</a></section>}
+else{
+<p>Describe the task, problem or requirements. The developer reviews these privately in the database; no inbox, history or reply service is offered. Do not include guest details, private links, passwords or sensitive information.</p>
+<div asp-validation-summary="All" role="alert" class="error"></div><form method="post" class="card"><input asp-for="Key" type="hidden"/><input asp-for="Kind" type="hidden"/>
+<label asp-for="Body">Task, problem or requirements</label><textarea asp-for="Body" minlength="10" maxlength="4000" required></textarea>
+<label asp-for="Contact">Preferred contact (optional)</label><input asp-for="Contact" maxlength="200"/><p>No email is sent. Custom requires an explicit later agreement; multi-property, payments and unsupported features are not granted by this form.</p>
+<label class="check"><input asp-for="Acknowledged"/> I voluntarily submit these suggestions for product improvement without a promise of payment, credit, delivery or ownership of the resulting product. My existing rights remain mine. This is separate from guest-data processing and does not permit public testimonials or unrelated use of personal data.</label>
+<p>Five submissions/account/UTC day. Closed and unreviewed New records are removed after 12 months; selected ongoing work is retained until closed. <a href="/Privacy">Draft privacy notice</a>.</p><button>Send privately</button></form>}
