@@ -5,8 +5,10 @@ using Microsoft.EntityFrameworkCore;
 using StayWidget.Domain;
 using StayWidget.Persistence;
 namespace StayWidget.Web.Pages.Owner;
-public sealed class IndexModel(StayDb db, BookingService service, TimeProvider clock) : PageModel
+public sealed class IndexModel(StayDb db, BookingService service, TimeProvider clock, EmailSettings email) : PageModel
 {
+    public string EmailNotice => email.Notice;
+    public Dictionary<Guid,ConfirmationEmail> Emails { get; private set; } = [];
     public Property? Property { get; private set; } public Unit? Unit { get; private set; }
     public List<ReservationRequest> Requests { get; private set; } = [];
     public int RequestPage { get; private set; } = 1; public bool More { get; private set; }
@@ -26,6 +28,8 @@ public sealed class IndexModel(StayDb db, BookingService service, TimeProvider c
         Unit = await db.Units.AsNoTracking().Where(x => x.PropertyId == Property.Id).OrderBy(x => x.Name).FirstAsync();
         Requests = await db.Requests.AsNoTracking().Where(x => x.PropertyId == Property.Id).OrderByDescending(x => x.Created).ThenBy(x => x.Id).Skip((RequestPage - 1) * 100).Take(101).ToListAsync();
         More = Requests.Count > 100; Requests = Requests.Take(100).ToList();
+        var ids = Requests.Select(x => x.Id).ToArray();
+        Emails = await db.ConfirmationEmails.AsNoTracking().Where(x => x.PropertyId == Property.Id && ids.Contains(x.RequestId)).ToDictionaryAsync(x => x.RequestId);
     }
     public async Task<IActionResult> OnPostSetup(bool understand)
     {

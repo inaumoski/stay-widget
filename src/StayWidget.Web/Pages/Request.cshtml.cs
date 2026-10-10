@@ -8,8 +8,9 @@ using Microsoft.AspNetCore.RateLimiting;
 namespace StayWidget.Web.Pages;
 [IgnoreAntiforgeryToken]
 [EnableRateLimiting("guest")]
-public sealed class RequestModel(StayDb db, BookingService service, TimeProvider clock, IDataProtectionProvider protection, SiteOrigin site, ILogger<RequestModel> log) : PageModel
+public sealed class RequestModel(StayDb db, BookingService service, TimeProvider clock, IDataProtectionProvider protection, SiteOrigin site, ILogger<RequestModel> log, EmailSettings email) : PageModel
 {
+    public string EmailNotice => email.Notice;
     private readonly IDataProtector protector=protection.CreateProtector("StayWidget.GuestForm.v3");
     public bool IsWidget => Request.Path.StartsWithSegments("/w");
     public bool ShowBranding => ProductPlans.ShowBranding(Property);
@@ -28,6 +29,7 @@ public sealed class RequestModel(StayDb db, BookingService service, TimeProvider
     [BindProperty] public int Guests {get;set;}=1;
     [BindProperty] public string GuestName {get;set;}="";
     [BindProperty] public string Phone {get;set;}="";
+    [BindProperty] public string Email {get;set;}="";
     [BindProperty] public string Key {get;set;}="";
     [BindProperty] public string FormContext {get;set;}="";
     [BindProperty] public bool Agree {get;set;}
@@ -54,7 +56,7 @@ public sealed class RequestModel(StayDb db, BookingService service, TimeProvider
             if(!EmbedPolicy.SameOrigin(Request,site))throw new RuleViolation("Submit using this property's request page.");
             if(action is not ("Search" or "Submit"))throw new RuleViolation("Choose availability search or request submission.");
             if(InstanceId != null && (InstanceId.Length!=32 || !InstanceId.All(Uri.IsHexDigit)))throw new RuleViolation("Reload this widget and try again.");
-            if(action=="Search") { ModelState.Remove(nameof(GuestName)); ModelState.Remove(nameof(Phone)); ModelState.Remove(nameof(Agree)); }
+            if(action=="Search") { ModelState.Remove(nameof(GuestName)); ModelState.Remove(nameof(Phone)); ModelState.Remove(nameof(Email)); ModelState.Remove(nameof(Agree)); }
             if(!ModelState.IsValid)throw new RuleViolation("Check the dates and guest count.");
             if(!Units.Any(x=>x.Id==UnitId))throw new RuleViolation("Choose an open unit.");
             var parts=protector.Unprotect(FormContext).Split('|');
@@ -62,7 +64,8 @@ public sealed class RequestModel(StayDb db, BookingService service, TimeProvider
             if(action=="Search") { if(parts[3]!=Property.TermsVersion)throw new RuleViolation("Property policies changed. Reload the page and review them before requesting."); Available=await service.Available(Unit,Arrival,Departure,Guests); return Page(); }
             if(!string.IsNullOrEmpty(Website))throw new RuleViolation("This submission could not be accepted. Reload or contact the property.");
             if(clock.GetUtcNow().ToUnixTimeSeconds()==issued)log.LogDebug("Anonymous form submitted in its first second; legitimate fast users are not blocked by timing alone.");
-            var receipt=await service.Submit(id,new(Unit.Id,Arrival,Departure,Guests,GuestName,Phone,Key,Agree,parts[3],HttpContext.Connection.RemoteIpAddress?.ToString()??"unknown"));
+            _ = EmailSettings.Address(Email);
+            var receipt=await service.Submit(id,new(Unit.Id,Arrival,Departure,Guests,GuestName,Phone,Key,Agree,parts[3],HttpContext.Connection.RemoteIpAddress?.ToString()??"unknown",Email));
             if(receipt.Token==null) { ModelState.AddModelError("","This request was already received. Use your saved status link or contact the property.");return Page(); }
             if(IsWidget){Receipt=receipt;ReceiptStatus=await service.Status(receipt.Token);return Page();}
             return Redirect("/GuestStatus#"+receipt.Token+(receipt.ActionToken!=null?"."+receipt.ActionToken:""));

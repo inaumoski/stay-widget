@@ -8,10 +8,10 @@ using StayWidget.Domain;
 using StayWidget.Persistence;
 namespace StayWidget.Web;
 
-public sealed record GuestInput(Guid UnitId, DateOnly Arrival, DateOnly Departure, int Guests, string Name, string Phone, string Key, bool Agree, string? TermsVersion = null, string? Network = null);
+public sealed record GuestInput(Guid UnitId, DateOnly Arrival, DateOnly Departure, int Guests, string Name, string Phone, string Key, bool Agree, string? TermsVersion = null, string? Network = null, string? Email = null);
 public sealed record Receipt(Guid Id, string? Token, DateTimeOffset Expires, string? ActionToken = null);
 public sealed record GuestStatus(string State, string Property, string Unit, DateOnly Arrival, DateOnly Departure, int Guests, DateTimeOffset Expires, string Contact, string Reason, decimal? Amount, string? Currency, bool CanWithdraw = false, bool CanRequestCancellation = false, bool CancellationRequested = false);
-public sealed partial class BookingService(StayDb db, TimeProvider clock, IDataProtectionProvider protection, SubmissionGuard? submissions = null, AggregateMetrics? metrics = null)
+public sealed partial class BookingService(StayDb db, TimeProvider clock, IDataProtectionProvider protection, SubmissionGuard? submissions = null, AggregateMetrics? metrics = null, SiteOrigin? site = null)
 {
     private readonly IDataProtector protector = protection.CreateProtector("StayWidget.Receipt.v1");
     private sealed record Tokens(string View, string Action);
@@ -46,8 +46,9 @@ public sealed partial class BookingService(StayDb db, TimeProvider clock, IDataP
     public async Task<Receipt> Submit(Guid propertyId, GuestInput input)
     {
         var name = input.Name.Trim(); var phone = input.Phone.Trim();
+        var email = input.Email == null ? "" : EmailSettings.Address(input.Email);
         if (!input.Agree || name.Length is < 1 or > 120 || phone.Length is < 5 or > 40 || input.Key.Length != 64 || !input.Key.All(Uri.IsHexDigit)) throw new RuleViolation("Enter your name and phone, review the policies and try again.");
-        var key = Hash(input.Key); var digest = Hash(JsonSerializer.Serialize(new { input.UnitId, input.Arrival, input.Departure, input.Guests, name, phone, input.Agree }));
+        var key = Hash(input.Key); var digest = email.Length == 0 ? Hash(JsonSerializer.Serialize(new { input.UnitId, input.Arrival, input.Departure, input.Guests, name, phone, input.Agree })) : Hash(JsonSerializer.Serialize(new { input.UnitId, input.Arrival, input.Departure, input.Guests, name, phone, input.Agree, email }));
         db.ChangeTracker.Clear();
         await using var tx = await db.Database.BeginTransactionAsync();
         var p = await db.Properties.FromSqlInterpolated($"SELECT * FROM \"Properties\" WHERE \"Id\"={propertyId} FOR UPDATE").SingleOrDefaultAsync() ?? throw new RuleViolation("Property is unavailable.");
@@ -71,6 +72,7 @@ public sealed partial class BookingService(StayDb db, TimeProvider clock, IDataP
         // PostgreSQL timestamps retain microseconds; return the same deadline on first submit and retries.
         var instant = clock.GetUtcNow(); var now = new DateTimeOffset(instant.Ticks - instant.Ticks % 10, instant.Offset); var token = Secret(); var actionToken = Secret();
         var request = new ReservationRequest { PropertyId = p.Id, UnitId = unit.Id, Arrival = input.Arrival, Departure = input.Departure, Guests = input.Guests, Name = name, Phone = phone, Created = now, Expires = StayRules.Deadline(now, input.Arrival, p.Zone), Policies = p.Policies, TermsVersion = p.TermsVersion, KeyHash = key, PayloadHash = digest, TokenHash = Hash(token), ActionHash = Hash(actionToken), ProtectedReceipt = protector.Protect(JsonSerializer.Serialize(new Tokens(token, actionToken))) };
+        request.Email = email;
         db.Requests.Add(request); await db.SaveChangesAsync(); await tx.CommitAsync(); metrics?.Record("request-submitted"); return new(request.Id, token, request.Expires, actionToken);
     }
     public async Task<Reservation> Confirm(Guid owner, Guid requestId, int revision, decimal amount, bool agreed)
@@ -94,6 +96,7 @@ public sealed partial class BookingService(StayDb db, TimeProvider clock, IDataP
         var reservation = new Reservation { PropertyId = p.Id, UnitId = unit.Id, RequestId = r.Id, Arrival = r.Arrival, Departure = r.Departure, Guests = r.Guests, Name = r.Name, Phone = r.Phone, Amount = amount, Currency = p.Currency, TermsVersion = r.TermsVersion, Confirmed = clock.GetUtcNow() };
         db.Reservations.Add(reservation); db.Allocations.Add(new InventoryAllocation { PropertyId = p.Id, UnitId = unit.Id, ReservationId = reservation.Id, Start = r.Arrival, End = r.Departure.AddDays(unit.Turnover), Created = clock.GetUtcNow() });
         r.State = "Accepted"; r.Revision++; r.Closed = clock.GetUtcNow();
+        QueueConfirmation(p, unit, r, reservation);
         Record(p.Id, owner, reservation.Id, "Reservation confirmed", $"{r.Arrival} to {r.Departure}");
         try { await db.SaveChangesAsync(); await tx.CommitAsync(); }
         catch (DbUpdateException e) when (e.InnerException is PostgresException { SqlState: "23P01" }) { throw new RuleViolation("Inventory changed. These dates cannot be confirmed."); }

@@ -11,6 +11,7 @@ public sealed class BrowserTests(TestDatabase db):IClassFixture<TestDatabase>
         var start=new ProcessStartInfo(Path.Combine(Environment.GetFolderPath(Environment.SpecialFolder.LocalApplicationData),"Fantoolie/dotnet/dotnet.exe"),$"\"{root}/src/StayWidget.Web/bin/Release/net10.0/StayWidget.Web.dll\"") {WorkingDirectory=Path.Combine(root,"src/StayWidget.Web"),UseShellExecute=false,CreateNoWindow=true,RedirectStandardOutput=true,RedirectStandardError=true};
         start.Environment["ASPNETCORE_ENVIRONMENT"]="Development"; start.Environment["ASPNETCORE_URLS"]="https://localhost:6269";start.Environment["StayWidget__PublicOrigin"]="https://localhost:6269";
         start.Environment["ConnectionStrings__StayWidget"]=db.Connection;start.Environment["Authentication__Enabled"]="false";start.Environment["StayWidget__DevelopmentLogin"]="true";
+        start.Environment["Email__Mode"]="Disabled";
         using var server=Process.Start(start)!;server.BeginOutputReadLine();server.BeginErrorReadLine();
         try
         {
@@ -24,7 +25,7 @@ public sealed class BrowserTests(TestDatabase db):IClassFixture<TestDatabase>
             await page.GetByLabel("Booking and cancellation policies").FillAsync("Contact the owner to agree price and cancellation terms before confirming.");await page.GetByLabel("Unit name",new(){Exact=true}).FillAsync("Garden Cottage");await page.Locator("input[name=understand]").CheckAsync();await page.GetByRole(AriaRole.Button,new(){Name="Create property and unit"}).ClickAsync();
             await page.GetByRole(AriaRole.Link,new(){Name="Open guest request page"}).WaitForAsync();var guestPath=await page.GetByRole(AriaRole.Link,new(){Name="Open guest request page"}).GetAttributeAsync("href");
             await using var guest=await browser.NewContextAsync(new(){IgnoreHTTPSErrors=true,ViewportSize=new(){Width=390,Height=844}});var gp=await guest.NewPageAsync();
-            await gp.GotoAsync("https://localhost:6269"+guestPath);await gp.GetByLabel("Name",new(){Exact=true}).FillAsync("Browser Guest");await gp.GetByLabel("Phone, including country code").FillAsync("+389 70 222 222");await gp.Locator("input[type=checkbox][name=Agree]").CheckAsync();await gp.GetByRole(AriaRole.Button,new(){Name="Send reservation request"}).ClickAsync();
+            await gp.GotoAsync("https://localhost:6269"+guestPath);await gp.GetByLabel("Name",new(){Exact=true}).FillAsync("Browser Guest");await gp.GetByLabel("Phone, including country code").FillAsync("+389 70 222 222");await gp.GetByLabel("Email for confirmation").FillAsync("guest@example.invalid");await gp.Locator("input[type=checkbox][name=Agree]").CheckAsync();await gp.GetByRole(AriaRole.Button,new(){Name="Send reservation request"}).ClickAsync();
             await Assertions.Expect(gp.GetByRole(AriaRole.Heading,new(){Name="Request received — awaiting approval"})).ToBeVisibleAsync();
             Assert.Empty(await guest.CookiesAsync());Assert.DoesNotContain("222 222",await gp.Locator("#status").InnerTextAsync());
             await page.ReloadAsync();

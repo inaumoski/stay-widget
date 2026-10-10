@@ -19,7 +19,7 @@ public sealed class RestoreTests(TestDatabase source):IClassFixture<TestDatabase
         {
             var service=new BookingService(db,TimeProvider.System,protection);owner=await service.User("urn:restore",Guid.NewGuid().ToString(),"Synthetic owner");
             var p=await service.Setup(owner,"Recovery test cottage","000 000 000","UTC","Synthetic property terms for recovery rehearsal.","Cottage",2);property=p.Id;
-            var u=await db.Units.SingleAsync(x=>x.PropertyId==p.Id);input=new(u.Id,u.OpenFrom.AddDays(2),u.OpenFrom.AddDays(4),2,"Synthetic guest","000 000 001",BookingService.Secret(),true);
+            var u=await db.Units.SingleAsync(x=>x.PropertyId==p.Id);input=new(u.Id,u.OpenFrom.AddDays(2),u.OpenFrom.AddDays(4),2,"Synthetic guest","000 000 001",BookingService.Secret(),true,Email:"recovery@example.invalid");
             receipt=await service.Submit(property,input);await service.Confirm(owner,receipt.Id,0,100,true);
         }
         var binary=Environment.GetEnvironmentVariable("STAYWIDGET_PG_BIN")??Path.GetFullPath(Path.Combine(root,"../shop-organizer/.local/pgsql/bin"));
@@ -42,6 +42,9 @@ public sealed class RestoreTests(TestDatabase source):IClassFixture<TestDatabase
             await Run("pg_restore.exe",target.Connection,"--clean","--if-exists",dump);
             await using var db=target.Db();var service=new BookingService(db,TimeProvider.System,DataProtectionProvider.Create(new DirectoryInfo(restoredKeys),b=>b.SetApplicationName("StayWidget.RecoveryTest")));
             Assert.Equal(receipt,await service.Submit(property,input));Assert.Equal("Accepted",(await service.Status(receipt.Token!))!.State);
+            var queued=await db.ConfirmationEmails.SingleAsync(x=>x.PropertyId==property);
+            var recovered=DataProtectionProvider.Create(new DirectoryInfo(restoredKeys),b=>b.SetApplicationName("StayWidget.RecoveryTest")).CreateProtector("StayWidget.ConfirmationEmail.v1").Unprotect(queued.ProtectedMessage);
+            Assert.Contains("recovery@example.invalid",recovered);Assert.Contains(receipt.ActionToken!,recovered);
             Assert.Single(await db.Allocations.Where(x=>x.PropertyId==property&&x.Active).ToListAsync());
             await Assert.ThrowsAsync<RuleViolation>(()=>service.ManualBooking(owner,Guid.NewGuid(),new(input.UnitId,input.Arrival,input.Departure,2,"Conflict","000 000 002",100,true)));
             Assert.Empty(await db.Database.GetPendingMigrationsAsync());

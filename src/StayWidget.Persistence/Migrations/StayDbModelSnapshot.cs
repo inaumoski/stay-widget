@@ -55,6 +55,62 @@ namespace StayWidget.Persistence.Migrations
                     b.ToTable("Activity");
                 });
 
+            modelBuilder.Entity("StayWidget.Persistence.ConfirmationEmail", b =>
+                {
+                    b.Property<Guid>("Id")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("uuid");
+
+                    b.Property<int>("Attempts")
+                        .HasColumnType("integer");
+
+                    b.Property<DateTimeOffset>("Created")
+                        .HasColumnType("timestamp with time zone");
+
+                    b.Property<string>("Failure")
+                        .IsRequired()
+                        .HasColumnType("text");
+
+                    b.Property<DateTimeOffset?>("Finished")
+                        .HasColumnType("timestamp with time zone");
+
+                    b.Property<DateTimeOffset?>("LastAttempt")
+                        .HasColumnType("timestamp with time zone");
+
+                    b.Property<DateTimeOffset>("NextAttempt")
+                        .HasColumnType("timestamp with time zone");
+
+                    b.Property<Guid>("PropertyId")
+                        .HasColumnType("uuid");
+
+                    b.Property<string>("ProtectedMessage")
+                        .IsRequired()
+                        .HasColumnType("text");
+
+                    b.Property<Guid>("RequestId")
+                        .HasColumnType("uuid");
+
+                    b.Property<string>("State")
+                        .IsRequired()
+                        .HasColumnType("text");
+
+                    b.HasKey("Id");
+
+                    b.HasIndex("Created");
+
+                    b.HasIndex("PropertyId");
+
+                    b.HasIndex("RequestId")
+                        .IsUnique();
+
+                    b.HasIndex("State", "NextAttempt");
+
+                    b.ToTable("ConfirmationEmails", t =>
+                        {
+                            t.HasCheckConstraint("ConfirmationEmailState", "\"State\" IN ('Queued','Accepted','LocalPreview','Failed','Unknown','Cancelled') AND \"Attempts\" BETWEEN 0 AND 5");
+                        });
+                });
+
             modelBuilder.Entity("StayWidget.Persistence.DailyMetric", b =>
                 {
                     b.Property<DateOnly>("Day")
@@ -408,6 +464,11 @@ namespace StayWidget.Persistence.Migrations
                     b.Property<DateOnly>("Departure")
                         .HasColumnType("date");
 
+                    b.Property<string>("Email")
+                        .IsRequired()
+                        .HasMaxLength(254)
+                        .HasColumnType("character varying(254)");
+
                     b.Property<DateTimeOffset>("Expires")
                         .HasColumnType("timestamp with time zone");
 
@@ -539,6 +600,21 @@ namespace StayWidget.Persistence.Migrations
                         .WithMany()
                         .HasForeignKey("PropertyId")
                         .OnDelete(DeleteBehavior.Restrict)
+                        .IsRequired();
+                });
+
+            modelBuilder.Entity("StayWidget.Persistence.ConfirmationEmail", b =>
+                {
+                    b.HasOne("StayWidget.Persistence.Property", null)
+                        .WithMany()
+                        .HasForeignKey("PropertyId")
+                        .OnDelete(DeleteBehavior.Restrict)
+                        .IsRequired();
+
+                    b.HasOne("StayWidget.Persistence.ReservationRequest", null)
+                        .WithMany()
+                        .HasForeignKey("RequestId")
+                        .OnDelete(DeleteBehavior.Cascade)
                         .IsRequired();
                 });
 

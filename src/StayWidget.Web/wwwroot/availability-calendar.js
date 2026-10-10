@@ -64,5 +64,8 @@
   previous.addEventListener('click', () => { month = shift(-1); load(); });
   next.addEventListener('click', () => { month = shift(1); load(); });
   retry.addEventListener('click', load); unit?.addEventListener('change', load); guests?.addEventListener('change', load);
+  // Refresh visible inventory after owner decisions without claiming a live date hold.
+  document.addEventListener('visibilitychange', () => { if (!document.hidden) load(); });
+  setInterval(() => { if (!document.hidden && !calendar.contains(document.activeElement)) load(); }, 60000);
   load();
 })();

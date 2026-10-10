@@ -9,6 +9,7 @@ public sealed class StayDb(DbContextOptions<StayDb> options) : DbContext(options
     public DbSet<ActivityRecord> Activity => Set<ActivityRecord>();
     public DbSet<ProductFeedback> Feedback => Set<ProductFeedback>();
     public DbSet<DailyMetric> Metrics => Set<DailyMetric>();
+    public DbSet<ConfirmationEmail> ConfirmationEmails => Set<ConfirmationEmail>();
     protected override void OnModelCreating(ModelBuilder b)
     {
         b.Entity<LocalUser>().HasIndex(x => new { x.Issuer, x.Subject }).IsUnique();
@@ -51,5 +52,12 @@ public sealed class StayDb(DbContextOptions<StayDb> options) : DbContext(options
         b.Entity<ProductFeedback>().ToTable(t => t.HasCheckConstraint("FeedbackState", "\"Status\" IN ('New','Reviewed','Planned','InProgress','Closed') AND ((\"Status\"='Closed' AND \"Closed\" IS NOT NULL AND \"CloseReason\" IS NOT NULL AND \"CloseReason\" IN ('Delivered','Duplicate','NotPlanned','CannotReproduce','Spam')) OR (\"Status\"<>'Closed' AND \"Closed\" IS NULL AND \"CloseReason\" IS NULL)) AND ((\"Status\"='New' AND \"Reviewed\" IS NULL) OR (\"Status\"<>'New' AND \"Reviewed\" IS NOT NULL)) AND \"Kind\" IN ('Feedback','Custom')"));
         b.Entity<DailyMetric>().HasKey(x => new { x.Day, x.Event });
         b.Entity<DailyMetric>().Property(x => x.Event).HasMaxLength(40);
+        b.Entity<ReservationRequest>().Property(x => x.Email).HasMaxLength(254);
+        b.Entity<ConfirmationEmail>().HasIndex(x => x.RequestId).IsUnique();
+        b.Entity<ConfirmationEmail>().HasIndex(x => new { x.State, x.NextAttempt });
+        b.Entity<ConfirmationEmail>().HasIndex(x => x.Created);
+        b.Entity<ConfirmationEmail>().HasOne<Property>().WithMany().HasForeignKey(x => x.PropertyId).OnDelete(DeleteBehavior.Restrict);
+        b.Entity<ConfirmationEmail>().HasOne<ReservationRequest>().WithMany().HasForeignKey(x => x.RequestId).OnDelete(DeleteBehavior.Cascade);
+        b.Entity<ConfirmationEmail>().ToTable(t => t.HasCheckConstraint("ConfirmationEmailState", "\"State\" IN ('Queued','Accepted','LocalPreview','Failed','Unknown','Cancelled') AND \"Attempts\" BETWEEN 0 AND 5"));
     }
 }

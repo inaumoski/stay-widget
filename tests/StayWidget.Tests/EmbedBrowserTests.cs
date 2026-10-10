@@ -28,6 +28,7 @@ public sealed class EmbedBrowserTests(TestDatabase fixture) : IClassFixture<Test
             {WorkingDirectory=Path.Combine(root,"src/StayWidget.Web"),UseShellExecute=false,CreateNoWindow=true,RedirectStandardOutput=true,RedirectStandardError=true};
         start.Environment["ASPNETCORE_ENVIRONMENT"]="Development";start.Environment["ASPNETCORE_URLS"]=app;start.Environment["StayWidget__PublicOrigin"]=app;
         start.Environment["ConnectionStrings__StayWidget"]=fixture.Connection;start.Environment["Authentication__Enabled"]="false";start.Environment["StayWidget__DevelopmentLogin"]="true";
+        start.Environment["Email__Mode"]="Disabled";
         using var server=Process.Start(start)!;server.BeginOutputReadLine();server.BeginErrorReadLine();
         try
         {
@@ -56,7 +57,7 @@ public sealed class EmbedBrowserTests(TestDatabase fixture) : IClassFixture<Test
             await second.Locator("body").EvaluateAsync("(b,id)=>parent.postMessage({v:1,type:'staywidget:resize',instance:id,height:777},'http://127.0.0.1:6280')",instance);
             await page.EvaluateAsync("id=>postMessage({v:1,type:'staywidget:resize',instance:id,height:777},location.origin)",instance);
             await Task.Delay(150);Assert.Equal(heights,await page.EvaluateAsync<string[]>("[...document.querySelectorAll('iframe')].map(f=>f.height)"));
-            await first.GetByLabel("Name",new(){Exact=true}).FillAsync("Embed Guest");await first.GetByLabel("Phone, including country code").FillAsync("+389 70 444 444");await first.Locator("input[type=checkbox][name=Agree]").CheckAsync();
+            await first.GetByLabel("Name",new(){Exact=true}).FillAsync("Embed Guest");await first.GetByLabel("Phone, including country code").FillAsync("+389 70 444 444");await first.GetByLabel("Email for confirmation").FillAsync("guest@example.invalid");await first.Locator("input[type=checkbox][name=Agree]").CheckAsync();
             await first.Locator("input[name=Website]").EvaluateAsync("el=>el.value='bot.example'");await first.GetByRole(AriaRole.Button,new(){Name="Send reservation request"}).ClickAsync();await Assertions.Expect(first.GetByRole(AriaRole.Alert)).ToContainTextAsync("could not be accepted");
             await using(var db=fixture.Db())Assert.False(await db.Requests.AnyAsync(x=>x.PropertyId==propertyId));
             Assert.Equal("Embed Guest",await first.GetByLabel("Name",new(){Exact=true}).InputValueAsync());await first.Locator("input[name=Website]").EvaluateAsync("el=>el.value=''");
@@ -71,7 +72,10 @@ public sealed class EmbedBrowserTests(TestDatabase fixture) : IClassFixture<Test
             Assert.Empty(await guest.CookiesAsync());var before=await guest.APIRequest.GetAsync(app+"/api/guest/withdraw");Assert.Equal(405,before.Status);
             var wrongScope=await guest.APIRequest.PostAsync(app+"/api/guest/withdraw",new(){DataObject=new{Confirmed=true},Headers=new Dictionary<string,string>{{"Authorization","Bearer "+secrets[0]}}});Assert.Equal(404,wrongScope.Status);
             var crossSite=await guest.APIRequest.PostAsync(app+"/api/guest/withdraw",new(){DataObject=new{Confirmed=true},Headers=new Dictionary<string,string>{{"Authorization","Bearer "+secrets[1]},{"Origin","https://unapproved.example"}}});Assert.Equal(400,crossSite.Status);
-            await using(var db=fixture.Db()){var r=await db.Requests.SingleAsync(x=>x.PropertyId==propertyId);await fixture.Service(db).Confirm(ownerId,r.Id,0,120,true);}
+            await op.GotoAsync(app+"/Owner");await op.Locator("input[name=amount]").FillAsync("120");await op.Locator("input[name=agreed]").CheckAsync();await op.GetByRole(AriaRole.Button,new(){Name="Confirm reservation",Exact=true}).ClickAsync();
+            await using(var db=fixture.Db()){Assert.Equal("Queued",(await db.ConfirmationEmails.SingleAsync(x=>x.PropertyId==propertyId)).State);}
+            var bookedNight=await second.GetByLabel("Check-in",new(){Exact=true}).InputValueAsync();await second.Locator("body").EvaluateAsync("()=>document.dispatchEvent(new Event('visibilitychange'))");
+            await Assertions.Expect(second.GetByLabel(bookedNight+": Unavailable night",new(){Exact=true})).ToBeVisibleAsync();
             var configuration=await http.GetStringAsync(app+"/api/widget/"+propertyId+"/configuration");Assert.DoesNotContain("ownerId",configuration);Assert.DoesNotContain("embedOrigins",configuration);Assert.DoesNotContain("444 444",configuration);
             await using(var db=fixture.Db()){var r=await db.Requests.SingleAsync(x=>x.PropertyId==propertyId);var availability=await http.PostAsJsonAsync(app+"/api/widget/"+propertyId+"/availability",new { r.Arrival,r.Departure,r.Guests });var body=await availability.Content.ReadAsStringAsync();Assert.Contains("\"available\":false",body);Assert.DoesNotContain("Embed Guest",body);Assert.DoesNotContain("444 444",body);Assert.False(availability.Headers.Contains("Access-Control-Allow-Origin"));}
             await status.ReloadAsync();await Assertions.Expect(status.GetByRole(AriaRole.Heading,new(){Name="Reservation confirmed"})).ToBeVisibleAsync();
@@ -85,7 +89,7 @@ public sealed class EmbedBrowserTests(TestDatabase fixture) : IClassFixture<Test
             // Direct iframe remains usable without JavaScript and storage: a server-rendered receipt follows POST.
             await using var noJs=await browser.NewContextAsync(new(){IgnoreHTTPSErrors=true,JavaScriptEnabled=false,ViewportSize=new(){Width=390,Height=844}});var direct=await noJs.NewPageAsync();await direct.GotoAsync(host+"/direct");
             var df=direct.FrameLocator("iframe");await df.GetByLabel("Check-in",new(){Exact=true}).FillAsync(DateOnly.FromDateTime(DateTime.UtcNow).AddDays(20).ToString("yyyy-MM-dd"));await df.GetByLabel("Check-out",new(){Exact=true}).FillAsync(DateOnly.FromDateTime(DateTime.UtcNow).AddDays(22).ToString("yyyy-MM-dd"));
-            await df.GetByLabel("Name",new(){Exact=true}).FillAsync("No script guest");await df.GetByLabel("Phone, including country code").FillAsync("+389 70 555 555");await df.Locator("input[type=checkbox][name=Agree]").CheckAsync();await df.GetByRole(AriaRole.Button,new(){Name="Send reservation request"}).ClickAsync();await Assertions.Expect(df.GetByRole(AriaRole.Heading,new(){Name="Request received — awaiting approval"})).ToBeVisibleAsync();Assert.Empty(await noJs.CookiesAsync());
+            await df.GetByLabel("Name",new(){Exact=true}).FillAsync("No script guest");await df.GetByLabel("Phone, including country code").FillAsync("+389 70 555 555");await df.GetByLabel("Email for confirmation").FillAsync("guest@example.invalid");await df.Locator("input[type=checkbox][name=Agree]").CheckAsync();await df.GetByRole(AriaRole.Button,new(){Name="Send reservation request"}).ClickAsync();await Assertions.Expect(df.GetByRole(AriaRole.Heading,new(){Name="Request received — awaiting approval"})).ToBeVisibleAsync();Assert.Empty(await noJs.CookiesAsync());
             // Seed this disposable property to its daily safety limit, then verify the real HTML rejection preserves input.
             await using(var db=fixture.Db())
             {
@@ -95,7 +99,7 @@ public sealed class EmbedBrowserTests(TestDatabase fixture) : IClassFixture<Test
                 await db.SaveChangesAsync();
             }
             var limited=await guest.NewPageAsync();await limited.GotoAsync(app+"/request/"+propertyId);await limited.GetByLabel("Check-in",new(){Exact=true}).FillAsync(DateOnly.FromDateTime(DateTime.UtcNow).AddDays(40).ToString("yyyy-MM-dd"));await limited.GetByLabel("Check-out",new(){Exact=true}).FillAsync(DateOnly.FromDateTime(DateTime.UtcNow).AddDays(42).ToString("yyyy-MM-dd"));
-            await limited.GetByLabel("Name",new(){Exact=true}).FillAsync("Retained form input");await limited.GetByLabel("Phone, including country code").FillAsync("+389 70 666 666");await limited.Locator("input[type=checkbox][name=Agree]").CheckAsync();
+            await limited.GetByLabel("Name",new(){Exact=true}).FillAsync("Retained form input");await limited.GetByLabel("Phone, including country code").FillAsync("+389 70 666 666");await limited.GetByLabel("Email for confirmation").FillAsync("guest@example.invalid");await limited.Locator("input[type=checkbox][name=Agree]").CheckAsync();
             var rejectionTask=limited.WaitForResponseAsync(r=>r.Request.Method=="POST"&&r.Url.Contains("/request/"));await limited.GetByRole(AriaRole.Button,new(){Name="Send reservation request"}).ClickAsync();var rejection=await rejectionTask;Assert.Equal(429,rejection.Status);Assert.NotNull(await rejection.HeaderValueAsync("Retry-After"));
             await Assertions.Expect(limited.GetByRole(AriaRole.Alert)).ToContainTextAsync("No new request was created");Assert.Equal("Retained form input",await limited.GetByLabel("Name",new(){Exact=true}).InputValueAsync());
             await using(var db=fixture.Db())Assert.Equal(100,await db.Requests.CountAsync(x=>x.PropertyId==propertyId));

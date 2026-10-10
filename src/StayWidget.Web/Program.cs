@@ -19,6 +19,18 @@ builder.Services.AddSingleton<SubmissionGuard>();
 var publicOrigin = builder.Configuration["StayWidget:PublicOrigin"];
 if (!builder.Environment.IsDevelopment() && string.IsNullOrWhiteSpace(publicOrigin)) throw new InvalidOperationException("Production requires the canonical HTTPS StayWidget:PublicOrigin.");
 builder.Services.AddSingleton(new SiteOrigin(publicOrigin ?? "https://localhost:7259"));
+var emailSettings = builder.Configuration.GetSection("Email").Get<EmailSettings>() ?? new EmailSettings();
+emailSettings.Validate(builder.Environment.IsDevelopment());
+if(emailSettings.Mode == "Sink")
+{
+    var sink = Path.GetFullPath(emailSettings.SinkDirectory);
+    var webroot = Path.GetFullPath(builder.Environment.WebRootPath ?? Path.Combine(builder.Environment.ContentRootPath,"wwwroot"));
+    if(sink.Equals(webroot,StringComparison.OrdinalIgnoreCase) || sink.StartsWith(webroot + Path.DirectorySeparatorChar,StringComparison.OrdinalIgnoreCase)) throw new InvalidOperationException("Email sink must be outside webroot.");
+}
+builder.Services.AddSingleton(emailSettings);
+builder.Services.AddHttpClient("Brevo",c => c.Timeout=TimeSpan.FromSeconds(15)).ConfigurePrimaryHttpMessageHandler(()=>new HttpClientHandler { AllowAutoRedirect=false }).RemoveAllLoggers();
+builder.Services.AddScoped<IConfirmationTransport,ConfirmationTransport>(); builder.Services.AddScoped<ConfirmationDispatcher>();
+if(emailSettings.Mode != "Disabled") builder.Services.AddHostedService<ConfirmationEmailWorker>();
 builder.Services.AddHttpContextAccessor(); builder.Services.AddSingleton<AggregateMetrics>(); builder.Services.AddScoped<FeedbackService>();
 if(builder.Configuration.GetValue("StayWidget:MaintenanceEnabled",true)) builder.Services.AddHostedService<ProductMaintenanceWorker>();
 builder.Services.Configure<ForwardedHeadersOptions>(o =>

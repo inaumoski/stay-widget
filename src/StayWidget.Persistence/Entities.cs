@@ -43,6 +43,17 @@ public sealed class ReservationRequest
     public bool Redacted { get; set; }
     public string? ActionHash { get; set; }
     public bool CapabilitiesRevoked { get; set; }
+    public string Email { get; set; } = "";
+}
+
+public sealed class ConfirmationEmail
+{
+    public Guid Id { get; set; } = Guid.NewGuid(); public Guid PropertyId { get; set; } public Guid RequestId { get; set; }
+    public string ProtectedMessage { get; set; } = "";
+    public string State { get; set; } = "Queued"; public string Failure { get; set; } = "";
+    public int Attempts { get; set; } public DateTimeOffset Created { get; set; } public DateTimeOffset NextAttempt { get; set; }
+    public DateTimeOffset? Finished { get; set; }
+    public DateTimeOffset? LastAttempt { get; set; }
 }
 public sealed class Reservation
 {

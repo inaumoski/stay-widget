@@ -16,6 +16,8 @@ public sealed partial class BookingService
         command.CommandText = "SELECT pg_try_advisory_xact_lock(741038221)";
         if (!Equals(await command.ExecuteScalarAsync(cancellation), true)) return 0;
         var now = clock.GetUtcNow();
+        var oldEmailIds = await db.ConfirmationEmails.Where(x => x.Created < now.AddDays(-30)).OrderBy(x => x.Created).Take(100).Select(x => x.Id).ToListAsync(cancellation);
+        await db.ConfirmationEmails.Where(x => oldEmailIds.Contains(x.Id)).ExecuteDeleteAsync(cancellation);
         var ids = await db.Properties.OrderBy(x => x.MaintenanceAt).ThenBy(x => x.Id).Take(20).Select(x => x.Id).ToListAsync(cancellation);
         int expired = 0;
         foreach (var id in ids.Order())
@@ -27,7 +29,7 @@ public sealed partial class BookingService
             foreach (var r in pending)
             { r.State = "Expired"; r.Closed = r.Expires; r.Revision++; Record(id, null, r.Id, "Request expired"); expired++; }
             var receiptLimit = now.AddHours(-24);
-            foreach (var r in await db.Requests.Where(x => x.PropertyId == id && x.Created <= receiptLimit && x.ProtectedReceipt != "").OrderBy(x => x.Id).Take(100).ToListAsync(cancellation))
+            foreach (var r in await db.Requests.Where(x => x.PropertyId == id && x.Created <= receiptLimit && x.ProtectedReceipt != "" && !(x.State == "Pending" && x.Email != "")).OrderBy(x => x.Id).Take(100).ToListAsync(cancellation))
                 r.ProtectedReceipt = "";
             var requestLimit = now.AddDays(-90);
             foreach (var r in await db.Requests.Where(x => x.PropertyId == id && x.State != "Pending" && x.State != "Accepted" && !x.Redacted &&
@@ -64,7 +66,7 @@ public sealed partial class BookingService
 
     private static void Redact(ReservationRequest r)
     {
-        r.Name = ""; r.Phone = ""; r.PublicReason = ""; r.Policies = ""; r.ProtectedReceipt = "";
+        r.Name = ""; r.Phone = ""; r.Email = ""; r.PublicReason = ""; r.Policies = ""; r.ProtectedReceipt = "";
         r.Redacted = true; r.Revision++;
         // Hashes remain as non-contact retry tombstones until the 24-month history sweep.
     }
