@@ -44,7 +44,14 @@ builder.Services.Configure<ForwardedHeadersOptions>(o =>
 if (builder.Configuration.GetValue("StayWidget:MaintenanceEnabled", true)) builder.Services.AddHostedService<MaintenanceWorker>();
 var dataRoot = builder.Configuration["StayWidget:DataRoot"];
 if (!builder.Environment.IsDevelopment() && string.IsNullOrWhiteSpace(dataRoot)) throw new InvalidOperationException("Production requires a private persistent StayWidget:DataRoot.");
-builder.Services.AddDataProtection().SetApplicationName("StayWidget").PersistKeysToFileSystem(new DirectoryInfo(dataRoot ?? Path.Combine(Environment.GetFolderPath(Environment.SpecialFolder.LocalApplicationData), "StayWidget", "keys")));
+var keyProtection = builder.Services.AddDataProtection().SetApplicationName("StayWidget").PersistKeysToFileSystem(new DirectoryInfo(dataRoot ?? Path.Combine(Environment.GetFolderPath(Environment.SpecialFolder.LocalApplicationData), "StayWidget", "keys")));
+if (OperatingSystem.IsLinux() && !builder.Environment.IsDevelopment() && !builder.Environment.IsEnvironment("Testing"))
+{
+    var certificate = builder.Configuration["StayWidget:KeyCertificatePath"]
+        ?? throw new InvalidOperationException("Configure a production certificate to protect persistent StayWidget keys.");
+    keyProtection.ProtectKeysWithCertificate(System.Security.Cryptography.X509Certificates.X509CertificateLoader.LoadPkcs12FromFile(
+        certificate, builder.Configuration["StayWidget:KeyCertificatePassword"]));
+}
 builder.Services.AddRazorPages(o => { o.Conventions.AuthorizeFolder("/Owner"); o.Conventions.AddPageRoute("/Request", "/w/{id:guid}"); });
 var auth = builder.Services.AddAuthentication(CookieAuthenticationDefaults.AuthenticationScheme).AddCookie(o => { o.Cookie.Name = "StayWidget.Owner"; o.Cookie.HttpOnly = true; o.Cookie.SecurePolicy = CookieSecurePolicy.Always; o.Cookie.SameSite = SameSiteMode.Lax; o.LoginPath = "/SignIn"; o.ExpireTimeSpan = TimeSpan.FromHours(8); });
 var enabled = builder.Configuration.GetValue<bool>("Authentication:Enabled");
@@ -163,7 +170,7 @@ app.MapGet("/widget-theme/{id:guid}.css", async (Guid id, StayDb db) =>
     return color == null ? Results.NotFound() : Results.Text($":root{{--accent:{EmbedPolicy.Accent(color)};}}", "text/css");
 });
 app.MapGet("/sitemap.xml",(SiteOrigin site)=>Results.Text("<?xml version=\"1.0\" encoding=\"utf-8\"?><urlset xmlns=\"http://www.sitemaps.org/schemas/sitemap/0.9\">"+string.Join("",PublicPages.Routes.Keys.Select(x=>"<url><loc>"+System.Security.SecurityElement.Escape(site.Value+x)+"</loc></url>"))+"</urlset>","application/xml"));
-app.MapGet("/robots.txt",(SiteOrigin site)=>Results.Text("User-agent: *\nDisallow: /Owner\nDisallow: /GuestStatus\nDisallow: /w/\nDisallow: /request/\nDisallow: /api/\nSitemap: "+site.Value+"/sitemap.xml\n","text/plain"));
+app.MapGet("/robots.txt",(SiteOrigin site)=>Results.Text("User-agent: *\nDisallow: /Owner$\nDisallow: /Owner?\nDisallow: /Owner/\nDisallow: /owner$\nDisallow: /owner?\nDisallow: /owner/\nDisallow: /GuestStatus$\nDisallow: /GuestStatus?\nDisallow: /GuestStatus/\nDisallow: /gueststatus$\nDisallow: /gueststatus?\nDisallow: /gueststatus/\nDisallow: /w$\nDisallow: /w?\nDisallow: /w/\nDisallow: /request$\nDisallow: /request?\nDisallow: /request/\nDisallow: /api$\nDisallow: /api?\nDisallow: /api/\nDisallow: /SignIn$\nDisallow: /SignIn?\nDisallow: /SignIn/\nDisallow: /signin$\nDisallow: /signin?\nDisallow: /signin/\nDisallow: /signin-funtoolio$\nDisallow: /signin-funtoolio?\nDisallow: /signin-funtoolio/\nDisallow: /signout-callback-oidc$\nDisallow: /signout-callback-oidc?\nDisallow: /signout-callback-oidc/\nDisallow: /demo-widget$\nDisallow: /demo-widget?\nDisallow: /demo-widget/\nDisallow: /widget-theme$\nDisallow: /widget-theme?\nDisallow: /widget-theme/\nDisallow: /health$\nDisallow: /health?\nDisallow: /health/\nSitemap: "+site.Value+"/sitemap.xml\n","text/plain"));
 app.MapGet("/go/{destination}",(string destination,AggregateMetrics metrics)=>
 {
     var url=destination switch { "product"=>"https://staywidget.funtoolie.com/", "portfolio"=>"https://funtoolio.com/", _=>null };

@@ -1,10 +1,10 @@
 # StayWidget release and operations
 
-Prepared 10 October 2026 for M5. **No production deployment or Linux execution has occurred.** Local tests and a disposable restore provide evidence, not approval for live guest intake. Production origin selected by the owner: `https://staywidget.funtoolie.com`. Important contact: `contact.stay@funtoolie.com`; delivery/monitoring unverified. This spelling is intentional and distinct from the playbook's `funtoolio.com` ecosystem destinations.
+Prepared 10 October 2026 for M5. **No production deployment or Linux execution has occurred.** Local tests and a disposable restore provide evidence, not approval for live guest intake. Production origin selected by the owner: `https://staywidget.funtoolio.com`. Important contact: `contact.stay@funtoolio.com`; delivery/monitoring unverified. This spelling is intentional and distinct from the playbook's `funtoolio.com` ecosystem destinations.
 
 ## Release gates
 
-Before real bookings, record the operator identity/markets, finalize reviewed policies and versioned owner agreement, verify the contact mailbox is monitored, verify actual hosting/DNS/TLS and register a distinct production Funtoolio OIDC client with callback `https://staywidget.funtoolie.com/signin-funtoolio`. No Gmail scopes. Complete a human Google callback/logout/session test; the local challenge alone is insufficient. Verify actual published WordPress/Wix or restrict the advertised pilot to tested platforms.
+Before real bookings, record the operator identity/markets, finalize reviewed policies and versioned owner agreement, verify the contact mailbox is monitored, verify actual hosting/DNS/TLS and register a distinct production Funtoolio OIDC client with callback `https://staywidget.funtoolio.com/signin-funtoolio`. No Gmail scopes. Complete a human Google callback/logout/session test; the local challenge alone is insufficient. Verify actual published WordPress/Wix or restrict the advertised pilot to tested platforms.
 
 Confirm off-server encrypted database/key/config backups, a restore rehearsal on the selected Linux environment and a monitored incident route. The local Windows rehearsal is not proof of encrypted off-server recovery, Linux execution, provider uptime or production capacity. Verify external ecosystem destinations before publishing; attempts from this workspace did not establish their reachability. The selected product destination replaces the original provisional `funtoolio.com/staywidget/` attribution URL.
 
@@ -35,7 +35,7 @@ Production key names (set through a private service environment/config file; nev
 | `ASPNETCORE_ENVIRONMENT` | `Production` |
 | `ASPNETCORE_URLS` | Loopback-only upstream, e.g. `http://127.0.0.1:5280` |
 | `ConnectionStrings__StayWidget` | Dedicated runtime role/database; restricted permissions, bounded pool/timeouts |
-| `StayWidget__PublicOrigin` | `https://staywidget.funtoolie.com` |
+| `StayWidget__PublicOrigin` | `https://staywidget.funtoolio.com` |
 | `StayWidget__DataRoot` | Persistent private Data Protection key directory outside releases/wwwroot |
 | `StayWidget__BehindLoopbackProxy` | `true` only with a single trusted loopback proxy |
 | `StayWidget__DevelopmentLogin` | `false`; Production rejects true |
@@ -99,4 +99,4 @@ Report `page-*` as page requests, `widget-view` as widget responses, `hosted-vie
 
 ## Confirmation email operations
 
-Follow [email setup](email.md) for private Brevo configuration, selected noreply@funtoolie.com sender, queue states, quota, recipient contact and cancellation semantics. The worker is independent of reservation correctness. Confirmed dates remain unavailable on any sending failure. Disabled mode is mandatory for recovery fixtures; private development uses Sink. Monitor aged Queued / Failed / Unknown records and contact guests manually when needed. Verify sender/domain authentication, live inbox receipt, provider privacy/tracking and the canonical link before enabling live sends. Email delivery is not proved by health/ready or HTTP 201. No payments are introduced.
+Follow [email setup](email.md) for private Brevo configuration, selected noreply@funtoolio.com sender, queue states, quota, recipient contact and cancellation semantics. The worker is independent of reservation correctness. Confirmed dates remain unavailable on any sending failure. Disabled mode is mandatory for recovery fixtures; private development uses Sink. Monitor aged Queued / Failed / Unknown records and contact guests manually when needed. Verify sender/domain authentication, live inbox receipt, provider privacy/tracking and the canonical link before enabling live sends. Email delivery is not proved by health/ready or HTTP 201. No payments are introduced.

@@ -1,0 +1,68 @@
+.funtoolio-projects {
+  display: block;
+  flex: 1 0 100%;
+  width: 100%;
+  min-width: 0;
+  margin-block-start: 1rem;
+  padding-block: 1rem;
+  border-block-start: 1px solid var(--funtoolio-projects-border, currentColor);
+  color: inherit;
+  font: inherit;
+  font-size: 0.875rem;
+  line-height: 1.5;
+}
+footer.funtoolio-footer {
+  flex-wrap: wrap;
+}
+footer.funtoolio-footer nav.funtoolio-projects {
+  display: block;
+}
+.funtoolio-projects .funtoolio-projects__heading {
+  margin: 0 0 0.5rem;
+  color: inherit;
+  font-size: inherit;
+  font-weight: 600;
+}
+.funtoolio-projects .funtoolio-projects__list {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0.5rem 1.5rem;
+  margin: 0;
+  padding: 0;
+  list-style: none;
+}
+.funtoolio-projects .funtoolio-projects__list > li {
+  flex: 0 1 auto;
+  min-width: 0;
+  max-width: 100%;
+  margin: 0;
+  padding: 0;
+  overflow-wrap: anywhere;
+}
+.funtoolio-projects .funtoolio-projects__list a {
+  display: inline-flex;
+  align-items: center;
+  min-height: 2.75rem;
+  max-width: 100%;
+  color: inherit;
+  font-weight: 600;
+  text-decoration: underline;
+  text-underline-offset: 0.2em;
+}
+.funtoolio-projects .funtoolio-projects__list a:hover {
+  text-decoration-thickness: 2px;
+}
+.funtoolio-projects .funtoolio-projects__list a:focus-visible {
+  outline: 2px solid currentColor;
+  outline-offset: 3px;
+  border-radius: 2px;
+}
+.funtoolio-projects .funtoolio-projects__list span {
+  display: block;
+  color: inherit;
+}
+@media (max-width: 40rem) {
+  .funtoolio-projects .funtoolio-projects__list > li {
+    flex-basis: 100%;
+  }
+}

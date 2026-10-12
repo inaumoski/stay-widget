@@ -1,5 +1,23 @@
 # StayWidget implementation status
 
+## Authorized robots.txt rollout — 2026-10-12
+
+Active release `20261012-010`. Owner and guest-status rules include emitted PascalCase and common lowercase aliases; widget/request/API/sign-in/callback/demo-widget/property-theme/health paths excluded. Public pages, static assets and the embed loader remain allowed. Live policies, public/private crawl boundaries, health, shared sign-in routing and anonymous access/noindex/no-store checks pass. See [robots deployment evidence](robots-2026-10-12.md). No schema/configuration change or commit/push.
+
+## Public SEO update — 2026-10-12
+
+Active production release `20261012-006`. Improved title/description, widget heading and installation links; added an honest guesthouse booking workflow example. Hosted-preview wording replaces stale local-only copy; configured-email and manual-calendar limitations retained. Themes and artwork preserved. Public metadata, sitemap/canonical/cache and mobile checks pass; no database or sign-in changes. See [SEO evidence and Search Console follow-up](seo-2026-10-12.md). Source local, deployed; no commit/push.
+
+## Shared ecosystem footer — 2026-10-12
+
+Owner authorized adding the complete footer and updating production. Native `_FuntoolioProjects` partial links to Funtoolio and the other four products, omitting this product; scoped first-party CSS preserves the product palette. Homepage coverage only, except StayWidget retains existing public-information-page coverage. Shopdesk’s stale local-only footer label now says Hosted preview. Active release `20261012-005` is a copy of the previous release with only web DLL/PDB and footer CSS replaced; dependency/runtime manifests were verified identical before switching. All previous artifacts retained. No migration/configuration/data change, commit or push.
+
+Release publish passed. Live HTTPS homepage and CSS returned 200; the footer has exactly the five intended destinations. Browser checks passed at 320/390/1440 pixels, footer 200% zoom, comfortable link targets and visible keyboard focus. Mobile footer screenshots visually reviewed. Collector requests were blocked during QA. This does not constitute a full accessibility audit. All production services and local monitoring remained healthy. See [initial deployment/recovery evidence](deployment-2026-10-12.md).
+
+## Authorized VPS hosting — 2026-10-12
+
+Hosted preview at https://staywidget.funtoolio.com/; release `20261012-002`. See [deployment evidence and remaining dependencies](deployment-2026-10-12.md). This dated entry supersedes older local-only deployment statements for this release. No commit/push performed; existing local work preserved.
+
 Last updated: 2026-10-10
 
 - **Current phase:** Readiness, local M5 preparation.

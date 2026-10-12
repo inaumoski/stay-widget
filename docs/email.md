@@ -8,7 +8,7 @@ The real widget/hosted form requires one guest email address, name and phone. Se
 
 Owner confirmation commits the reservation, occupied-night allocation and one confirmation-email intent in the same PostgreSQL transaction. Confirmation retries do not create another email. Confirmed nights become unavailable immediately, including turnover gaps; pending enquiries still hold nothing. The visible guest calendar reloads on month/unit/guest changes, visibility return and once per minute when visible and not focused, while complete-stay checks and transactional confirmation remain authoritative.
 
-The message uses the selected sender **noreply@funtoolie.com**, a fixed subject, property/unit, arrival/departure, guest count, agreed EUR total and **the property's configured public owner contact details**. No payment is taken. The owner should enter useful phone/contact instructions in property settings; we do not expose the owner's Google profile/address.
+The message uses the selected sender **noreply@funtoolio.com**, a fixed subject, property/unit, arrival/departure, guest count, agreed EUR total and **the property's configured public owner contact details**. No payment is taken. The owner should enter useful phone/contact instructions in property settings; we do not expose the owner's Google profile/address.
 
 The email links to the existing `/GuestStatus#VIEW.ACTION` capability page. Fragments are absent from HTTP request URLs. Merely opening a link cannot cancel a booking. Guests explicitly request cancellation; owner review and recorded cancellation release dates under property policies. View/action scopes, expiry, revocation, suspension and redaction continue to apply. Anyone holding the complete link can use its permissions; email necessarily discloses it to the recipient and sending provider. Guest data and tokens are excluded from public availability responses, analytics and application delivery logs.
 
@@ -22,10 +22,10 @@ Configure privately through service environment or a secret store:
 
 ```text
 Email__Mode=Brevo
-Email__Sender=noreply@funtoolie.com
+Email__Sender=noreply@funtoolio.com
 Email__ApiKey=<private transactional API key>
 Email__DailyAttemptLimit=200
-StayWidget__PublicOrigin=https://staywidget.funtoolie.com
+StayWidget__PublicOrigin=https://staywidget.funtoolio.com
 ```
 
 Never commit keys or print them in diagnostic output. Brevo mode is refused in Development, and Sink is refused outside Development. Redirects are disabled, the provider endpoint is fixed, HTTP logs are removed and sends have a 15-second timeout. Email options default to the selected sender but do not prove it is verified. Production still requires persistent Data Protection keys and the existing canonical-origin/security configuration.

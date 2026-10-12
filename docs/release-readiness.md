@@ -21,10 +21,10 @@ M1–M4 feature work is implemented. M5 local preparation is verified; **StayWid
 
 | Gate | Required evidence before launch |
 | --- | --- |
-| Origin and TLS | DNS/certificate/reverse proxy for `staywidget.funtoolie.com`, exact Host and HTTPS forwarding, upstream isolation and renewal monitoring |
+| Origin and TLS | DNS/certificate/reverse proxy for `staywidget.funtoolio.com`, exact Host and HTTPS forwarding, upstream isolation and renewal monitoring |
 | Owner authentication | Distinct production Funtoolio client/callback and complete human Google sign-in/logout/session test |
-| Confirmation email | Verify noreply@funtoolie.com in Brevo, private API key, shared quota/outbound HTTPS, provider privacy/tracking and real inbox receipt/private cancellation link. Local sink only is currently enabled. |
-| Important contact | `contact.stay@funtoolie.com` delivery and a real monitored security/privacy/legal process; no automated application email is introduced |
+| Confirmation email | Verify noreply@funtoolio.com in Brevo, private API key, shared quota/outbound HTTPS, provider privacy/tracking and real inbox receipt/private cancellation link. Local sink only is currently enabled. |
+| Important contact | `contact.stay@funtoolio.com` delivery and a real monitored security/privacy/legal process; no automated application email is introduced |
 | Operator/policies | Real operator identity/markets, privacy roles/legal bases, reviewed disclosures/owner policy acceptance and documented rights handling |
 | Customer installation | Actual published plain HTML pilot and WordPress/Wix checks for the specific plans, scripts, nested ancestors, mobile sizing and private status popups; restrict claims to verified platforms |
 | Ecosystem links | Live checks of playbook portfolio destinations; workspace attempts did not establish reachability |
