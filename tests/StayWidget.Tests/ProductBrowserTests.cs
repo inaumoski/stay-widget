@@ -27,7 +27,7 @@ public sealed class ProductBrowserTests(TestDatabase fixture):IClassFixture<Test
             foreach(var path in PublicPages.Routes.Keys)
             {
                 var response=await page.GotoAsync(app+path);Assert.Equal(200,response!.Status);Assert.False((await response.AllHeadersAsync()).ContainsKey("x-robots-tag"));
-                Assert.Equal(app+path,await page.Locator("link[rel=canonical]").GetAttributeAsync("href"));Assert.NotEmpty(await page.Locator("meta[name=description]").GetAttributeAsync("content")??"");
+                Assert.Equal(app+path.TrimEnd('/'),await page.Locator("link[rel=canonical]").GetAttributeAsync("href"));Assert.NotEmpty(await page.Locator("meta[name=description]").GetAttributeAsync("content")??"");
                 Assert.Equal(1,await page.GetByRole(AriaRole.Navigation,new(){Name="More from this ecosystem"}).CountAsync());
                 Assert.True(await page.EvaluateAsync<bool>("document.documentElement.scrollWidth<=innerWidth+1"));
             }

@@ -6,6 +6,7 @@ namespace StayWidget.Web;
 public sealed class SiteOrigin(string value)
 {
     public string Value { get; } = EmbedPolicy.Origin(value, false);
+    public string Canonical(string path) => Value + path.TrimEnd('/');
 }
 
 public static class EmbedPolicy

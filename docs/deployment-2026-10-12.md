@@ -25,3 +25,7 @@ Active release is now `20261012-006`; see [SEO evidence](seo-2026-10-12.md). Pub
 ## Subsequent robots.txt release
 
 Active release is now `20261012-010`; see [robots deployment evidence](robots-2026-10-12.md). Owner-authorized crawl-policy updates only, with previous artifacts retained.
+
+## Canonical URL release — 2026-10-25
+
+Owner-authorized release `20261025-001` is now active, superseding the historical releases above. Limited metadata/sitemap/public-route update; prior release retained, runtime/dependencies/configuration/database preserved. Live sitemap/canonical and public/private smoke checks pass. See implementation-status.md for actual scope and verification. No commit/push.
