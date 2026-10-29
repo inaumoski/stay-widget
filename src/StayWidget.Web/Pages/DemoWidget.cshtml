@@ -1,7 +1,9 @@
 @page "/demo-widget"
 @model StayWidget.Web.Pages.DemoWidgetModel
 @{Layout=null;}
-<!doctype html><html lang="en"><head><meta charset="utf-8"/><meta name="viewport" content="width=device-width,initial-scale=1"/><title>Demo Guesthouse · synthetic widget demo</title><link rel="stylesheet" href="/site.css"/></head>
+<!doctype html><html lang="en"><head><meta charset="utf-8"/><meta name="viewport" content="width=device-width,initial-scale=1"/><title>Demo Guesthouse · synthetic widget demo</title><link rel="stylesheet" href="/site.css"/><link rel="icon" type="image/x-icon" sizes="16x16 32x32 48x48 64x64" href="/favicon.ico" />
+<link rel="icon" type="image/svg+xml" sizes="any" href="/favicon.svg" />
+</head>
 <body class="widget"><main><p class="eyebrow">SYNTHETIC DEMO — NO REAL BOOKING</p><h1>Demo Guesthouse</h1><p>Two sample units with separate availability and guest capacities. No contact details collected, no saved requests, no email or payments.</p>
 <div asp-validation-summary="All" role="alert" class="error"></div>
 @if(Model.Stage=="Search"){

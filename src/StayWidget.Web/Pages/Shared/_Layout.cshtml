@@ -5,6 +5,8 @@
 @if(publicPage){<meta name="description" content="@(ViewData["Description"]??"Simple direct reservation requests for small B&Bs, guesthouses and holiday rentals. Keep your existing website and confirm each stay yourself.")"/><link rel="canonical" href="@Site.Canonical(PublicPages.CanonicalPath(Context.Request.Path)!)"/>}
 <link rel="stylesheet" href="/site.css"/>
     @if (publicPage) { <link rel="stylesheet" href="~/css/funtoolio-projects.css" asp-append-version="true" /> }
+<link rel="icon" type="image/x-icon" sizes="16x16 32x32 48x48 64x64" href="/favicon.ico" />
+<link rel="icon" type="image/svg+xml" sizes="any" href="/favicon.svg" />
 </head><body><header><a class="brand" href="/">StayWidget<span>Simple stays. Clear requests.</span></a><nav aria-label="Main">@if(publicPage){<a href="/Pricing">Pricing</a><a href="/Demo">Demo</a><a href="/Install">Installation</a>}<a href="/Owner">Owner dashboard</a>@if(User.Identity?.IsAuthenticated == true){<form method="post" asp-page="/SignIn" asp-page-handler="Logout"><button class="secondary">Sign out</button></form>}else{<a href="/SignIn">Sign in</a>}</nav></header><main>@RenderBody()</main><footer class="funtoolio-footer"><p>Reservation requests need property approval. Guest confirmation email requires configured delivery. No external calendar synchronization.</p>
 @if(publicPage){<nav aria-label="Product information"><a href="/Limitations">Limitations</a><a href="/Privacy">Privacy draft</a><a href="/Terms">Terms of use (draft)</a><a href="/Contact">Contact and support</a></nav><partial name="_FuntoolioProjects" />}
 @if(publicTracking){<partial name="Shared/_AnalyticsSettings"/>}

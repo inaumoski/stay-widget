@@ -1,5 +1,21 @@
 # StayWidget implementation status
 
+## Homepage explanation deployed — 2026-10-29
+
+Owner-authorized release **20261029-002** is live with **251 visible explanatory words** on the homepage. Only the web assembly/symbol pair changed over retained favicon release 20261029-001; assembly-method and exact file/HTML comparisons isolate the copy additions. Live word count, 320/390/1440px reflow, no-JavaScript, automated accessibility and service health pass. Favicons, all environment/Caddy settings, schema and other sites are unchanged. See [release evidence](../../funtoolio-playbook/references/homepage-copy-audit-2026-10-29.md). No commit/push; earlier local-only notes below describe preparation.
+
+## Homepage explanation expanded locally — 2026-10-29
+
+Owner requested roughly 200+ explanatory words; sign-in is explicitly excluded. This homepage now has **251 explanatory words**, up from 198, excluding navigation/footer, examples, headings, collapsed FAQ and UI labels. Release publish and local rendered 320/390/1440px, 200% zoom, no-JavaScript and automated accessibility checks pass. See [counting method and evidence](../../funtoolio-playbook/references/homepage-copy-audit-2026-10-29.md). Local only: not deployed, committed or pushed. Existing changes preserved.
+
+## Favicon-only deployment — 2026-10-29
+
+Owner-authorized favicon release **20261029-001** is live. Root favicon.ico and document-head links are deployed; missing SVG marks were added where applicable. Exact file hashes and assembly-method comparisons isolate the icon changes. Live icon bytes/MIME, homepage markup outside icons and service health pass; environment/Caddy settings are unchanged. Previous release retained. No schema change, commit or push. See [portfolio release evidence](../../funtoolio-playbook/references/favicon-release-2026-10-29.md). Earlier local-only/favicon and release-state notes below are historical.
+
+## Favicon coverage prepared locally — 2026-10-29
+
+Added a square, theme-matched SVG favicon and root favicon.ico fallback, with head links across this project’s document layouts. ICO contains 16/32/48/64px images; existing logos/colors and any Apple touch icons are preserved. SVG artwork visually reviewed; all four ICO images decode successfully and source head links resolve to local assets. Local source only: not deployed, committed or pushed. Release build passed with zero warnings/errors; favicon.ico is present in the .NET static-assets manifest.
+
 ## Authorized robots.txt rollout — 2026-10-12
 
 Active release `20261012-010`. Owner and guest-status rules include emitted PascalCase and common lowercase aliases; widget/request/API/sign-in/callback/demo-widget/property-theme/health paths excluded. Public pages, static assets and the embed loader remain allowed. Live policies, public/private crawl boundaries, health, shared sign-in routing and anonymous access/noindex/no-store checks pass. See [robots deployment evidence](robots-2026-10-12.md). No schema/configuration change or commit/push.
